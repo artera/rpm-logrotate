@@ -1,6 +1,10 @@
+%if %{?WITH_SELINUX:0}%{!?WITH_SELINUX:1}
+%define WITH_SELINUX 0
+%endif
+
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
-Version: 3.6.8
+Version: 3.6.10
 Release: 1
 License: GPL
 Group: System Environment/Base
@@ -22,7 +26,10 @@ log files on your system.
 %setup
 
 %build
-make RPM_OPT_FLAGS="$RPM_OPT_FLAGS"
+make RPM_OPT_FLAGS="$RPM_OPT_FLAGS" \
+%if %{WITH_SELINUX}
+	WITH_SELINUX=yes
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -49,6 +56,15 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Thu Jul 24 2003 Elliot Lee <sopwith@redhat.com> 3.6.10-1
+- Fix #100546, change selinux port.
+
+* Wed Jul 18 2003 Dan Walsh <dwalsh@redhat.com> 3.6.9-2
+- Port to SELinux 2.5
+
+* Wed Jul 09 2003 Elliot Lee <sopwith@redhat.com> 3.6.9-1
+- Fix #90229, #90274, #89458, #91408
+
 * Mon Jan 20 2003 Elliot Lee <sopwith@redhat.com> 3.6.8-1
 - Old patch from pm@debian.org
 
