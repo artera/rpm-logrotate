@@ -5,13 +5,14 @@ BuildRequires: libselinux-devel
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
 Version: 3.7.1
-Release: 6
+Release: 7
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
 #Patch0: logrotate-3.7.1-share.patch
 Patch1: logrotate-3.7.1-man.patch
 Patch2: logrotate-3.7.1-conf.patch
+Patch3: logrotate-3.7.1-noTMPDIR.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}.root
 
 %description
@@ -30,6 +31,7 @@ log files on your system.
 #%patch0 -p1 -b .share
 %patch1 -p1 -b .orig
 %patch2 -p1 -b .conf
+%patch3 -p1 -b .noTMPDIR
 
 %build
 make RPM_OPT_FLAGS="$RPM_OPT_FLAGS -g" \
@@ -62,6 +64,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Tue Feb 22 2005 Peter Vrabec <pvrabec@redhat.com>
+- do not use tmpfile to run script anymore (#149270)
+
 * Fri Feb 18 2005 Peter Vrabec <pvrabec@redhat.com>
 - remove logrotate-3.7.1-share.patch, it doesn't solve (#140353)
 
