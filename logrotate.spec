@@ -5,7 +5,7 @@ BuildRequires: libselinux-devel
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
 Version: 3.7.1
-Release: 7
+Release: 8
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
@@ -64,6 +64,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Thu Mar 17 2005 Peter Vrabec <pvrabec@redhat.com> 3.7.1-8
+- rebuild
+
 * Tue Feb 22 2005 Peter Vrabec <pvrabec@redhat.com>
 - do not use tmpfile to run script anymore (#149270)
 
