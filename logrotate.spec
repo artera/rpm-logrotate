@@ -1,6 +1,6 @@
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
-Version: 3.5.2
+Version: 3.5.4
 Release: 1
 Copyright: GPL
 Group: System Environment/Base
@@ -36,6 +36,8 @@ install -m 755 examples/logrotate.cron $RPM_BUILD_ROOT/etc/cron.daily/logrotate
 rm -rf $RPM_BUILD_ROOT
 
 %files
+%defattr(-,root,root)
+%doc CHANGES
 %attr(0755, root, root) /usr/sbin/logrotate
 %attr(0644, root, root) %{_mandir}/man8/logrotate.8*
 %attr(0755, root, root) /etc/cron.daily/logrotate
@@ -43,6 +45,12 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755, root, root) %dir /etc/logrotate.d
 
 %changelog
+* Thu Jan  4 2001 Bill Nottingham <notting@redhat.com>
+- %defattr
+
+* Wed Jan 03 2001 Preston Brown <pbrown@redhat.com>
+- see CHANGES
+
 * Tue Aug 15 2000 Erik Troan <ewt@redhat.com>
 - see CHANGES
 
