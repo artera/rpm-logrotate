@@ -1,11 +1,11 @@
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
-Version: 3.5.8
+Version: 3.5.9
 Release: 1
-Copyright: GPL
+License: GPL
 Group: System Environment/Base
-Source: ftp://ftp.redhat.com/pub/redhat/code/logrotate/logrotate-%{PACKAGE_VERSION}.tar.gz
-BuildRoot: /var/tmp/logrotate.root
+Source: logrotate-%{PACKAGE_VERSION}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}.root
 
 %description
 The logrotate utility is designed to simplify the administration of
@@ -42,6 +42,12 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755, root, root) %dir /etc/logrotate.d
 
 %changelog
+* Tue Sep  4 2001 Preston Brown <pbrown@redhat.com>
+- fix segfault when logfile is in current directory.
+
+* Tue Aug 21 2001 Preston Brown <pbrown@redhat.com>
+- fix URL for source location
+
 * Thu Aug  2 2001 Preston Brown <pbrown@redhat.com>
 - man page cleanups, check for negative rotation counts
 
