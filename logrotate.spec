@@ -5,7 +5,7 @@
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
 Version: 3.7
-Release: 2.sel
+Release: 4
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
@@ -56,6 +56,12 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Mon Jan 26 2004 Dan Walsh <dwalsh@redhat.com> 3.6.10-4
+- fix is_selinux_enabled call
+
+* Fri Sep 5 2003 Dan Walsh <dwalsh@redhat.com> 3.6.10-3
+- Turn off selinux
+
 * Fri Sep 5 2003 Dan Walsh <dwalsh@redhat.com> 3.6.10-2.sel
 - Turn on selinux
 
