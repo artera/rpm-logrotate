@@ -1,6 +1,6 @@
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
-Version: 3.6.3
+Version: 3.6.4
 Release: 1
 License: GPL
 Group: System Environment/Base
@@ -9,11 +9,14 @@ BuildRoot: %{_tmppath}/%{name}-%{version}.root
 
 %description
 The logrotate utility is designed to simplify the administration of
-log files on a system which generates a lot of log files. Logrotate
-allows for the automatic rotation compression, removal, and mailing of
-log files. Logrotate can be set to handle a log file daily, weekly,
-monthly, or when the log file gets to a certain size. Normally,
+log files on a system which generates a lot of log files.  Logrotate
+allows for the automatic rotation compression, removal and mailing of
+log files.  Logrotate can be set to handle a log file daily, weekly,
+monthly or when the log file gets to a certain size.  Normally,
 logrotate runs as a daily cron job.
+
+Install the logrotate package if you need a utility to deal with the
+log files on your system.
 
 %prep
 %setup
@@ -46,6 +49,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Mon Apr 15 2002 Elliot Lee <sopwith@redhat.com> 3.6.4-1
+- Commit fix for #62560
+
 * Wed Mar 13 2002 Elliot Lee <sopwith@redhat.com> 3.6.3-1
 - Apply various bugfix patches from the openwall people
 
