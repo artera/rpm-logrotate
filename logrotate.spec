@@ -5,10 +5,11 @@ BuildRequires: libselinux-devel
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
 Version: 3.7.1
-Release: 2
+Release: 3
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
+Patch0: logrotate-3.7.1-share.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}.root
 
 %description
@@ -24,9 +25,10 @@ log files on your system.
 
 %prep
 %setup
+%patch0 -p1 -b .share
 
 %build
-make RPM_OPT_FLAGS="$RPM_OPT_FLAGS" \
+make RPM_OPT_FLAGS="$RPM_OPT_FLAGS -g" \
 %if %{WITH_SELINUX}
 	WITH_SELINUX=yes
 %endif
@@ -56,6 +58,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Mon Dec 06 2004 Peter Vrabec <pvrabec@redhar.com>
+- compressed logfiles and logrotate (#140353)
+
 * Tue Oct 19 2004 Miloslav Trmac <mitr@redhat.com> - 3.7.1-2
 - Fix sending mails (#131583)
 - Preserve file attributes when compressing files (#121523, original patch by
