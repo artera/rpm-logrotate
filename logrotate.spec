@@ -5,11 +5,11 @@ BuildRequires: libselinux-devel
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
 Version: 3.7.1
-Release: 5
+Release: 6
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
-Patch0: logrotate-3.7.1-share.patch
+#Patch0: logrotate-3.7.1-share.patch
 Patch1: logrotate-3.7.1-man.patch
 Patch2: logrotate-3.7.1-conf.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}.root
@@ -27,7 +27,7 @@ log files on your system.
 
 %prep
 %setup
-%patch0 -p1 -b .share
+#%patch0 -p1 -b .share
 %patch1 -p1 -b .orig
 %patch2 -p1 -b .conf
 
@@ -62,6 +62,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Fri Feb 18 2005 Peter Vrabec <pvrabec@redhat.com>
+- remove logrotate-3.7.1-share.patch, it doesn't solve (#140353)
+
 * Mon Dec 13 2004 Peter Vrabec <pvrabec@redhat.com> - 3.7.1-5
 - Add section to logrotate.conf for "/var/log/btmp" (#117844)
 
