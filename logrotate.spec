@@ -1,6 +1,6 @@
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
-Version: 3.5.9
+Version: 3.6.3
 Release: 1
 License: GPL
 Group: System Environment/Base
@@ -22,12 +22,15 @@ logrotate runs as a daily cron job.
 make RPM_OPT_FLAGS="$RPM_OPT_FLAGS"
 
 %install
+rm -rf $RPM_BUILD_ROOT
 make PREFIX=$RPM_BUILD_ROOT MANDIR=%{_mandir} install
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
 mkdir -p $RPM_BUILD_ROOT/etc/cron.daily
+mkdir -p $RPM_BUILD_ROOT/var/lib
 
 install -m 644 examples/logrotate-default $RPM_BUILD_ROOT/etc/logrotate.conf
 install -m 755 examples/logrotate.cron $RPM_BUILD_ROOT/etc/cron.daily/logrotate
+touch $RPM_BUILD_ROOT/var/lib/logrotate.status
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -38,10 +41,32 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755, root, root) /usr/sbin/logrotate
 %attr(0644, root, root) %{_mandir}/man8/logrotate.8*
 %attr(0755, root, root) /etc/cron.daily/logrotate
-%attr(0644, root, root) %config /etc/logrotate.conf
+%attr(0644, root, root) %config(noreplace) /etc/logrotate.conf
 %attr(0755, root, root) %dir /etc/logrotate.d
+%attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Wed Mar 13 2002 Elliot Lee <sopwith@redhat.com> 3.6.3-1
+- Apply various bugfix patches from the openwall people
+
+* Tue Jan 29 2002 Elliot Lee <sopwith@redhat.com> 3.6.2-1
+- Fix bug #55809 (include logrotate.status in %files)
+- Fix bug #58328 (incorrect error detection when reading state file)
+- Allow 'G' size specifier from bug #57242
+
+* Mon Dec 10 2001 Preston Brown <pbrown@redhat.com>
+- noreplace config file
+
+* Wed Nov 28 2001 Preston Brown <pbrown@redhat.com> 3.6-1
+- patch from Alexander Kourakos <awk@awks.org> to stop the shared
+  postrotate/prerotate scripts from running if none of the log(s) need
+  rotating.  All log files are now checked for rotation in one batch,
+  rather than sequentially.
+- more fixes from Paul Martin <pm@debian.org>
+
+* Thu Nov  8 2001 Preston Brown <pbrown@redhat.com> 3.5.10-1
+- fix from paul martin <pm@debian.org> for zero-length state files
+
 * Tue Sep  4 2001 Preston Brown <pbrown@redhat.com>
 - fix segfault when logfile is in current directory.
 
