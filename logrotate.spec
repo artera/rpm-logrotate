@@ -1,6 +1,6 @@
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
-Version: 3.5.4
+Version: 3.5.7
 Release: 1
 Copyright: GPL
 Group: System Environment/Base
@@ -45,8 +45,21 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755, root, root) %dir /etc/logrotate.d
 
 %changelog
+* Mon Jul  2 2001 Preston Brown <pbrown@redhat.com>
+- more minor manpage updates (#45625)
+
+* Thu Jun 21 2001 Preston Brown <pbrown@redhat.com> 3.5.6-1
+- enable LFS support (debian bug #100810)
+- quote filenames for running compress commands or pre/postrotate cmds (#21348)
+- deprecate "errors" directive (see bug #16544 for explanation)
+- update man page
+- configurable compression command by Colm Buckley <colm@tuatha.org>
+
+* Fri Jun  1 2001 Preston Brown <pbrown@redhat.com> 3.5.5-1
+- be less strict about whitespace near filenames.  Patch from Paul Martin <pm@debian.org>.
+
 * Thu Jan  4 2001 Bill Nottingham <notting@redhat.com>
-- %defattr
+- %%defattr
 
 * Wed Jan 03 2001 Preston Brown <pbrown@redhat.com>
 - see CHANGES
