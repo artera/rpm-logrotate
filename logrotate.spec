@@ -5,7 +5,7 @@ BuildRequires: libselinux-devel
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
 Version: 3.7.1
-Release: 9
+Release: 10
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
@@ -66,6 +66,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Thu Mar 31 2005 Dan Walsh <dwalsh@redhat.com> 3.7.1-10
+- use security_getenforce() instead of selinux_getenforcemode
+
 * Thu Mar 17 2005 Dan Walsh <dwalsh@redhat.com> 3.7.1-9
 - Add selinux_getenforce() calls to work when not in enforcing mode
 
