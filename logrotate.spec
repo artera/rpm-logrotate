@@ -1,11 +1,11 @@
 %if %{?WITH_SELINUX:0}%{!?WITH_SELINUX:1}
-%define WITH_SELINUX 0
+%define WITH_SELINUX 1
 %endif
 
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
-Version: 3.6.10
-Release: 1
+Version: 3.7
+Release: 2.sel
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
@@ -56,6 +56,19 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Fri Sep 5 2003 Dan Walsh <dwalsh@redhat.com> 3.6.10-2.sel
+- Turn on selinux
+
+* Wed Aug 06 2003 Erik Troan <ewt@redhat.com>
+- always use compressext for the extension for compressed
+  files; before compresscmd and compressext had to agree
+- moved all compression to one code block
+- compression, scripts don't use system() anymore
+- compress and maillast didn't work together properly
+- delaycompress and mailfirst didn't work properly
+- don't use system() for mailing (or uncompressing) logs anymore
+- use "-s" for speciying the subjected of mailed logs
+
 * Thu Jul 24 2003 Elliot Lee <sopwith@redhat.com> 3.6.10-1
 - Fix #100546, change selinux port.
 
