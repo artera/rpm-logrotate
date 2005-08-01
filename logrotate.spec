@@ -4,19 +4,11 @@ BuildRequires: libselinux-devel
 %endif
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
-Version: 3.7.1
-Release: 14
+Version: 3.7.2
+Release: 1
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
-#Patch0: logrotate-3.7.1-share.patch
-Patch1: logrotate-3.7.1-man.patch
-Patch2: logrotate-3.7.1-conf.patch
-Patch3: logrotate-3.7.1-noTMPDIR.patch
-Patch4: logrotate-3.7.1-selinux.patch
-Patch5: logrotate-3.7.1-dateext.patch
-Patch6: logrotate-3.7.1-maxage.patch
-Patch7: logrotate-3.7.1-scriptFailInfo.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}.root
 
 %description
@@ -32,14 +24,6 @@ log files on your system.
 
 %prep
 %setup
-#%patch0 -p1 -b .share
-%patch1 -p1 -b .orig
-%patch2 -p1 -b .conf
-%patch3 -p1 -b .noTMPDIR
-%patch4 -p1 -b .selinux
-%patch5 -p1 -b .dateext
-%patch6 -p1 -b .maxage
-%patch7 -p1 -b .scriptFailInfo
 
 %build
 make RPM_OPT_FLAGS="$RPM_OPT_FLAGS -g" \
@@ -72,6 +56,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Mon Aug 01 2005 Peter Vrabec <pvrabec@redhat.com> 3.7.2-1
+- new upstream release
+
 * Tue Jul 26 2005 Peter Vrabec <pvrabec@redhat.com> 3.7.1-14
 - fix some "error running script" messages
 
