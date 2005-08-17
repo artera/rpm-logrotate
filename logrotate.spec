@@ -5,11 +5,12 @@ BuildRequires: libselinux-devel
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
 Version: 3.7.2
-Release: 1
+Release: 2
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}.root
+Patch1: logrotate-3.7-yearly.patch
 
 %description
 The logrotate utility is designed to simplify the administration of
@@ -24,6 +25,7 @@ log files on your system.
 
 %prep
 %setup
+%patch1 -p1 -b .yearly
 
 %build
 make RPM_OPT_FLAGS="$RPM_OPT_FLAGS -g" \
@@ -56,6 +58,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Wed Aug 17 2005 Peter Vrabec <pvrabec@redhat.com> 3.7.2-2
+- allow yearly rotations(#134612)
+
 * Mon Aug 01 2005 Peter Vrabec <pvrabec@redhat.com> 3.7.2-1
 - new upstream release
 
