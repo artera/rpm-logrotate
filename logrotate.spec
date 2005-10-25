@@ -5,7 +5,7 @@ BuildRequires: libselinux-devel
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
 Version: 3.7.2
-Release: 9
+Release: 10
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
@@ -18,6 +18,7 @@ Patch5: logrotate-3.7.2-cleanUp.patch
 Patch6: logrotate-3.7.2-fix_free_segfaults.patch
 Patch7: logrotate-3.7.2-fixLeaks_tabooExts.patch
 Patch8: logrotate-3.7.2-fix_free_segfaults2.patch
+Patch9: logrotate-3.7.2-cleanUp2.patch
 
 %description
 The logrotate utility is designed to simplify the administration of
@@ -40,7 +41,7 @@ log files on your system.
 %patch6 -p1 -b .fix_free_segfaults
 %patch7 -p1 -b .fixLeaks_tabooExts
 %patch8 -p1 -b .fix_free_segfaults2
-
+%patch9 -p1 -b .cleanUp2
 
 %build
 make RPM_OPT_FLAGS="$RPM_OPT_FLAGS -g" \
@@ -73,6 +74,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Tue Oct 25 2005 Peter Vrabec <pvrabec@redhat.com> 3.7.2-10
+- some more clean up (#171587)
+
 * Thu Oct 20 2005 Peter Vrabec <pvrabec@redhat.com> 3.7.2-9
 - fix_free_segfaults (#171093)
 
