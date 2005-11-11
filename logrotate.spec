@@ -5,7 +5,7 @@ BuildRequires: libselinux-devel
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
 Version: 3.7.2
-Release: 11
+Release: 12
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
@@ -19,7 +19,8 @@ Patch6: logrotate-3.7.2-fix_free_segfaults.patch
 Patch7: logrotate-3.7.2-fixLeaks_tabooExts.patch
 Patch8: logrotate-3.7.2-fix_free_segfaults2.patch
 Patch9: logrotate-3.7.2-cleanUp2.patch
-Patch10: logrotate-3.7.2-patternAndNodataext.patch
+Patch10: logrotate-3.7.2-rotateDateext.patch
+Patch11: logrotate-3.7.2-fix_free_segfaults3.patch
 
 %description
 The logrotate utility is designed to simplify the administration of
@@ -43,7 +44,8 @@ log files on your system.
 %patch7 -p1 -b .fixLeaks_tabooExts
 %patch8 -p1 -b .fix_free_segfaults2
 %patch9 -p1 -b .cleanUp2
-%patch10 -p1 -b .patternAndNodataext
+%patch10 -p1 -b .rotateDateext
+%patch11 -p1 -b .fix_free_segfaults3
 
 %build
 make RPM_OPT_FLAGS="$RPM_OPT_FLAGS -g" \
@@ -76,9 +78,11 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
-* Mon Nov 07 2005 Peter Vrabec <pvrabec@redhat.com> 3.7.2-11
-- man description for "nodateext" option (#171577)
-- remove not working "pattern" option (#171577)
+* Fri Nov 11 2005 Peter Vrabec <pvrabec@redhat.com> 3.7.2-12
+- fix_free_segfaults (#172918)
+
+* Wed Nov 03 2005 Peter Vrabec <pvrabec@redhat.com> 3.7.2-11
+- ignore "rotate count" when "dateext" option is used(#170639)
 
 * Tue Oct 25 2005 Peter Vrabec <pvrabec@redhat.com> 3.7.2-10
 - some more clean up (#171587)
