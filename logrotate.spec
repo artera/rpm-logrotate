@@ -5,7 +5,7 @@ BuildRequires: libselinux-devel
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
 Version: 3.7.4
-Release: 3
+Release: 3.1
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
@@ -56,6 +56,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 3.7.4-3.1
+- rebuild
+
 * Tue Jun 13 2006 Peter Vrabec <pvrabec@redhat.com> 3.7.4-3
 - rename ENOSUP to ENOTSUP
 
