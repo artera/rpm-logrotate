@@ -1,15 +1,14 @@
-%if %{?WITH_SELINUX:0}%{!?WITH_SELINUX:1}
-%define WITH_SELINUX 1
-BuildRequires: libselinux-devel
-%endif
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
 Version: 3.7.4
-Release: 4
+Release: 5
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
+Patch: logrotate-selinux.patch
+
 BuildRoot: %{_tmppath}/%{name}-%{version}.root
+BuildRequires: libselinux-devel
 
 %description
 The logrotate utility is designed to simplify the administration of
@@ -24,12 +23,11 @@ log files on your system.
 
 %prep
 %setup
+%patch -p1 -b .rhat
 
 %build
 make RPM_OPT_FLAGS="$RPM_OPT_FLAGS -g" \
-%if %{WITH_SELINUX}
 	WITH_SELINUX=yes
-%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -56,6 +54,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Wed Aug 9 2006 Dan Walsh <dwalsh@redhat.com> 3.7.4-5
+- Use selinux raw functions
+
 * Mon Jul 24 2006 Peter Vrabec <pvrabec@redhat.com> 3.7.4-4
 - make error message, about ignoring certain config files,
   a debug message instead (#196052)
