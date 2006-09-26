@@ -1,12 +1,12 @@
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
 Version: 3.7.4
-Release: 5
+Release: 6
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
-Patch: logrotate-selinux.patch
-
+Patch1: logrotate-selinux.patch
+Patch2: logrotate-fdLeak.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}.root
 BuildRequires: libselinux-devel
 
@@ -23,7 +23,8 @@ log files on your system.
 
 %prep
 %setup
-%patch -p1 -b .rhat
+%patch1 -p1 -b .rhat
+%patch2 -p1 -b .fdLeak
 
 %build
 make RPM_OPT_FLAGS="$RPM_OPT_FLAGS -g" \
@@ -54,7 +55,10 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
-* Wed Aug 9 2006 Dan Walsh <dwalsh@redhat.com> 3.7.4-5
+* Tue Sep 26 2006 Peter Vrabec <pvrabec@redhat.com> 3.7.4-6
+- fix leaking file descriptor (#205072)
+
+* Wed Aug 09 2006 Dan Walsh <dwalsh@redhat.com> 3.7.4-5
 - Use selinux raw functions
 
 * Mon Jul 24 2006 Peter Vrabec <pvrabec@redhat.com> 3.7.4-4
