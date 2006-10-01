@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
 Version: 3.7.4
-Release: 6
+Release: 7
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
@@ -55,6 +55,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Sun Oct 01 2006 Jesse Keating <jkeating@redhat.com> - 3.7.4-7
+- rebuilt for unwind info generation, broken in gcc-4.1.1-21
+
 * Tue Sep 26 2006 Peter Vrabec <pvrabec@redhat.com> 3.7.4-6
 - fix leaking file descriptor (#205072)
 
