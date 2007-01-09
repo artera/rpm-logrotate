@@ -1,13 +1,14 @@
 Summary: Rotates, compresses, removes and mails system log files.
 Name: logrotate
 Version: 3.7.4
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
 Patch1: logrotate-selinux.patch
 Patch2: logrotate-fdLeak.patch
 Patch3: logrotate-sizeOption.patch
+Patch4: logrotate-widecharPath.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}.root
 BuildRequires: libselinux-devel
@@ -28,6 +29,7 @@ log files on your system.
 %patch1 -p1 -b .rhat
 %patch2 -p1 -b .fdLeak
 %patch3 -p1 -b .sizeOption
+%patch4 -p1 -b .widecharPath
 
 %build
 make RPM_OPT_FLAGS="$RPM_OPT_FLAGS -g" \
@@ -58,6 +60,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Tue Jan 09 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.4-9
+- allow multibyte characters in readPath() (#122145)
+
 * Fri Jan 05 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.4-8
 - "size" option was ignored in config files (#221341)
 
