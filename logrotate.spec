@@ -1,7 +1,7 @@
-Summary: Rotates, compresses, removes and mails system log files.
+Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.4
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
@@ -25,7 +25,7 @@ Install the logrotate package if you need a utility to deal with the
 log files on your system.
 
 %prep
-%setup
+%setup -q
 %patch1 -p1 -b .rhat
 %patch2 -p1 -b .fdLeak
 %patch3 -p1 -b .sizeOption
@@ -60,6 +60,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Wed Jan 10 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.4-10
+- fix some rpmlint issues
+
 * Tue Jan 09 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.4-9
 - allow multibyte characters in readPath() (#122145)
 
@@ -243,7 +246,7 @@ rm -rf $RPM_BUILD_ROOT
 - Apply various bugfix patches from the openwall people
 
 * Tue Jan 29 2002 Elliot Lee <sopwith@redhat.com> 3.6.2-1
-- Fix bug #55809 (include logrotate.status in %files)
+- Fix bug #55809 (include logrotate.status in "files")
 - Fix bug #58328 (incorrect error detection when reading state file)
 - Allow 'G' size specifier from bug #57242
 
