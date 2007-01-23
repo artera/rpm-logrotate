@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.4
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
@@ -9,6 +9,7 @@ Patch1: logrotate-selinux.patch
 Patch2: logrotate-fdLeak.patch
 Patch3: logrotate-sizeOption.patch
 Patch4: logrotate-widecharPath.patch
+Patch5: logrotate-errorConfiguration.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}.root
 BuildRequires: libselinux-devel
@@ -30,6 +31,7 @@ log files on your system.
 %patch2 -p1 -b .fdLeak
 %patch3 -p1 -b .sizeOption
 %patch4 -p1 -b .widecharPath
+%patch5 -p1 -b .errorConfiguration
 
 %build
 make RPM_OPT_FLAGS="$RPM_OPT_FLAGS -g" \
@@ -60,6 +62,10 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
 
 %changelog
+* Tue Jan 23 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.4-11
+- logrotate won't stop if there are some errors in configuration
+  or glob failures (#166510, #182062)
+
 * Wed Jan 10 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.4-10
 - fix some rpmlint issues
 
