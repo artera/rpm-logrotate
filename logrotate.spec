@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.4
-Release: 11%{?dist}
+Release: 12%{?dist}
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
@@ -10,9 +10,8 @@ Patch2: logrotate-fdLeak.patch
 Patch3: logrotate-sizeOption.patch
 Patch4: logrotate-widecharPath.patch
 Patch5: logrotate-errorConfiguration.patch
-
-BuildRoot: %{_tmppath}/%{name}-%{version}.root
 BuildRequires: libselinux-devel
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
 The logrotate utility is designed to simplify the administration of
@@ -27,15 +26,14 @@ log files on your system.
 
 %prep
 %setup -q
-%patch1 -p1 -b .rhat
+%patch1 -p1 -b .selinux
 %patch2 -p1 -b .fdLeak
 %patch3 -p1 -b .sizeOption
 %patch4 -p1 -b .widecharPath
 %patch5 -p1 -b .errorConfiguration
 
 %build
-make RPM_OPT_FLAGS="$RPM_OPT_FLAGS -g" \
-	WITH_SELINUX=yes
+make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -44,8 +42,8 @@ mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
 mkdir -p $RPM_BUILD_ROOT/etc/cron.daily
 mkdir -p $RPM_BUILD_ROOT/var/lib
 
-install -m 644 examples/logrotate-default $RPM_BUILD_ROOT/etc/logrotate.conf
-install -m 755 examples/logrotate.cron $RPM_BUILD_ROOT/etc/cron.daily/logrotate
+install -p -m 644 examples/logrotate-default $RPM_BUILD_ROOT/etc/logrotate.conf
+install -p -m 755 examples/logrotate.cron $RPM_BUILD_ROOT/etc/cron.daily/logrotate
 touch $RPM_BUILD_ROOT/var/lib/logrotate.status
 
 %clean
@@ -53,15 +51,19 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%doc CHANGES
-%attr(0755, root, root) /usr/sbin/logrotate
+%doc CHANGES COPYING
+%attr(0755, root, root) %{_sbindir}/logrotate
 %attr(0644, root, root) %{_mandir}/man8/logrotate.8*
-%attr(0755, root, root) /etc/cron.daily/logrotate
-%attr(0644, root, root) %config(noreplace) /etc/logrotate.conf
-%attr(0755, root, root) %dir /etc/logrotate.d
-%attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) /var/lib/logrotate.status
+%attr(0755, root, root) %{_sysconfdir}/cron.daily/logrotate
+%attr(0644, root, root) %config(noreplace) %{_sysconfdir}/logrotate.conf
+%attr(0755, root, root) %dir %{_sysconfdir}/logrotate.d
+%attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Thu Feb 08 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.4-12
+- fix problem with compress_options_list (#227706)
+- fix spec file to meet Fedora standards (#226104)
+
 * Tue Jan 23 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.4-11
 - logrotate won't stop if there are some errors in configuration
   or glob failures (#166510, #182062)
