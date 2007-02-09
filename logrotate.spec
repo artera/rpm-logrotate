@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.4
-Release: 12%{?dist}
+Release: 13%{?dist}
 License: GPL
 Group: System Environment/Base
 Source: logrotate-%{PACKAGE_VERSION}.tar.gz
@@ -38,13 +38,13 @@ make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes
 %install
 rm -rf $RPM_BUILD_ROOT
 make PREFIX=$RPM_BUILD_ROOT MANDIR=%{_mandir} install
-mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
-mkdir -p $RPM_BUILD_ROOT/etc/cron.daily
-mkdir -p $RPM_BUILD_ROOT/var/lib
+mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/logrotate.d
+mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/cron.daily
+mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib
 
-install -p -m 644 examples/logrotate-default $RPM_BUILD_ROOT/etc/logrotate.conf
-install -p -m 755 examples/logrotate.cron $RPM_BUILD_ROOT/etc/cron.daily/logrotate
-touch $RPM_BUILD_ROOT/var/lib/logrotate.status
+install -p -m 644 examples/logrotate-default $RPM_BUILD_ROOT/%{_sysconfdir}/logrotate.conf
+install -p -m 755 examples/logrotate.cron $RPM_BUILD_ROOT/%{_sysconfdir}/cron.daily/logrotate
+touch $RPM_BUILD_ROOT/%{_localstatedir}/lib/logrotate.status
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -60,6 +60,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Fri Feb 09 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.4-13
+- another spec file fixes (#226104)
+
 * Thu Feb 08 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.4-12
 - fix problem with compress_options_list (#227706)
 - fix spec file to meet Fedora standards (#226104)
