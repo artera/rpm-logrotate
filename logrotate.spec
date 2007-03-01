@@ -1,15 +1,17 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.7.4
-Release: 13%{?dist}
+Version: 3.7.5
+Release: 1%{?dist}
 License: GPL
 Group: System Environment/Base
-Source: logrotate-%{PACKAGE_VERSION}.tar.gz
-Patch1: logrotate-selinux.patch
-Patch2: logrotate-fdLeak.patch
-Patch3: logrotate-sizeOption.patch
-Patch4: logrotate-widecharPath.patch
-Patch5: logrotate-errorConfiguration.patch
+# The source for this package was pulled from cvs.
+# Use the following commands to generate the tarball:
+#  export CVSROOT=:pserver:anonymous@rhlinux.redhat.com:/usr/local/CVS
+#  cvs login (hit return)
+#  cvs co logrotate
+#  cd logrotate
+#  make create-archive
+Source: logrotate-%{version}.tar.gz
 BuildRequires: libselinux-devel
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -26,11 +28,6 @@ log files on your system.
 
 %prep
 %setup -q
-%patch1 -p1 -b .selinux
-%patch2 -p1 -b .fdLeak
-%patch3 -p1 -b .sizeOption
-%patch4 -p1 -b .widecharPath
-%patch5 -p1 -b .errorConfiguration
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes
@@ -60,6 +57,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Thu Mar 01 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.5-1
+- new upstream release.
+
 * Fri Feb 09 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.4-13
 - another spec file fixes (#226104)
 
