@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.5
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPL
 Group: System Environment/Base
 # The source for this package was pulled from cvs.
@@ -12,6 +12,7 @@ Group: System Environment/Base
 #  cd logrotate
 #  make create-archive
 Source: logrotate-%{version}.tar.gz
+Patch1: logrotate-3.7.5-errorHandling.patch
 BuildRequires: libselinux-devel
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -28,6 +29,7 @@ log files on your system.
 
 %prep
 %setup -q
+%patch1 -p1 -b .errorHandling
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes
@@ -57,6 +59,10 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Thu Mar 29 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.5-2
+- fix error hadnling after prerotate, postrotate, firstaction 
+  script failure. (http://qa.mandriva.com/show_bug.cgi?id=29979)
+
 * Thu Mar 01 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.5-1
 - new upstream release.
 
