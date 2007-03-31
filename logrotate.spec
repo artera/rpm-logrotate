@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.5
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL
 Group: System Environment/Base
 # The source for this package was pulled from cvs.
@@ -59,6 +59,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Sat Mar 31 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.5-3
+- add error checking before running prerotate and postrotate scripts
+
 * Thu Mar 29 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.5-2
 - fix error hadnling after prerotate, postrotate, firstaction 
   script failure. (http://qa.mandriva.com/show_bug.cgi?id=29979)

@@ -1,5 +1,5 @@
 --- logrotate-3.7.5/logrotate.c.errorHandling	2007-03-01 12:05:30.000000000 +0100
-+++ logrotate-3.7.5/logrotate.c	2007-03-29 15:55:48.000000000 +0200
++++ logrotate-3.7.5/logrotate.c	2007-03-31 12:50:33.000000000 +0200
 @@ -1043,6 +1043,8 @@
  		message(MESS_ERROR, "error running first action script "
  			"for %s\n", log->pattern);
@@ -9,7 +9,17 @@
  	    }
  	}
      }
-@@ -1074,9 +1076,16 @@
+@@ -1067,16 +1069,25 @@
+ 	    hasErrors |= logHasErrors[i];
+ 	}
+ 
+-	if (log->pre) {
++	if (log->pre
++	    && (! ( (logHasErrors[j] && !(log->flags & LOG_FLAG_SHAREDSCRIPTS))
++		   || (hasErrors && (log->flags & LOG_FLAG_SHAREDSCRIPTS)) ) )) {
+ 	    if (!numRotated) {
+ 		message(MESS_DEBUG, "not running prerotate script, "
+ 			"since no logs will be rotated\n");
  	    } else {
  		message(MESS_DEBUG, "running prerotate script\n");
  		if (runScript(log->pattern, log->pre)) {
@@ -29,7 +39,7 @@
  		    hasErrors = 1;
  		}
  	    }
-@@ -1085,7 +1094,8 @@
+@@ -1085,22 +1096,33 @@
  	for (i = j;
  	     ((log->flags & LOG_FLAG_SHAREDSCRIPTS) && i < log->numFiles)
  	     || (!(log->flags & LOG_FLAG_SHAREDSCRIPTS) && i == j); i++) {
@@ -39,7 +49,16 @@
  		logHasErrors[i] |=
  		    rotateSingleLog(log, i, state[i], rotNames[i]);
  		hasErrors |= logHasErrors[i];
-@@ -1099,8 +1109,16 @@
+ 	    }
+ 	}
+ 
+-	if (log->post) {
++	if (log->post
++	    && (! ( (logHasErrors[j] && !(log->flags & LOG_FLAG_SHAREDSCRIPTS))
++		   || (hasErrors && (log->flags & LOG_FLAG_SHAREDSCRIPTS)) ) )) {
+ 	    if (!numRotated) {
+ 		message(MESS_DEBUG, "not running postrotate script, "
+ 			"since no logs were rotated\n");
  	    } else {
  		message(MESS_DEBUG, "running postrotate script\n");
  		if (runScript(log->pattern, log->post)) {
@@ -58,7 +77,7 @@
  		    hasErrors = 1;
  		}
  	    }
-@@ -1109,7 +1127,8 @@
+@@ -1109,7 +1131,8 @@
  	for (i = j;
  	     ((log->flags & LOG_FLAG_SHAREDSCRIPTS) && i < log->numFiles)
  	     || (!(log->flags & LOG_FLAG_SHAREDSCRIPTS) && i == j); i++) {
@@ -69,7 +88,7 @@
  		    postrotateSingleLog(log, i, state[i], rotNames[i]);
  		hasErrors |= logHasErrors[i];
 --- logrotate-3.7.5/logrotate.8.errorHandling	2006-05-17 16:46:51.000000000 +0200
-+++ logrotate-3.7.5/logrotate.8	2007-03-29 15:53:53.000000000 +0200
++++ logrotate-3.7.5/logrotate.8	2007-03-31 12:37:06.000000000 +0200
 @@ -326,7 +326,8 @@
  \fBnosharedscripts\fR
  Run \fBprerotate\fR and \fBpostrotate\fR scripts for every log file which
