@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.5
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL
 Group: System Environment/Base
 # The source for this package was pulled from cvs.
@@ -13,6 +13,10 @@ Group: System Environment/Base
 #  make create-archive
 Source: logrotate-%{version}.tar.gz
 Patch1: logrotate-3.7.5-errorHandling.patch
+Patch2: logrotate-3.7.5-shred.patch
+Patch3: logrotate-3.7.5-cfengine.patch
+Patch4: logrotate-3.7.5-date.patch
+Requires: coreutils >= 5.92
 BuildRequires: libselinux-devel
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -30,6 +34,9 @@ log files on your system.
 %prep
 %setup -q
 %patch1 -p1 -b .errorHandling
+%patch2 -p1 -b .shred
+%patch3 -p1 -b .cfengine
+%patch4 -p1 -b .dateext
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes
@@ -59,6 +66,12 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Wed May 23 2007 Tomas Smetana <tsmetana@redhat.com> 3.7.5-4
+- use dateext in the default config file (#240292)
+- add options to use shred for deleting files -- adapt patch sent by
+  Peter Eckersley <pde@eff.org> (#239934)
+- ignore .cfsaved files by default (#223476)
+
 * Sat Mar 31 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.5-3
 - add error checking before running prerotate and postrotate scripts
 

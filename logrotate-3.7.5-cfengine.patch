@@ -1,0 +1,11 @@
+--- logrotate-3.7.5/config.c.cfengine	2007-05-14 14:18:44.000000000 +0200
++++ logrotate-3.7.5/config.c	2007-05-14 14:19:06.000000000 +0200
+@@ -31,7 +31,7 @@
+ #endif
+ 
+ static char *defTabooExts[] = { ".rpmsave", ".rpmorig", "~", ",v",
+-    ".rpmnew", ".swp"
++    ".rpmnew", ".swp", ".cfsaved"
+ };
+ static int defTabooCount = sizeof(defTabooExts) / sizeof(char *);
+ 
