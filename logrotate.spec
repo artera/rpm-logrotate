@@ -1,8 +1,8 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.6
-Release: 1%{?dist}
-License: GPL
+Release: 1.1%{?dist}
+License: GPL+
 Group: System Environment/Base
 # The source for this package was pulled from cvs.
 # Use the following commands to generate the tarball:
@@ -58,6 +58,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Thu Aug 23 2007 Tomas Smetana <tsmetana@redhat.com> 3.7.6-1.1
+- rebuild
+
 * Tue Aug 07 2007 Tomas Smetana <tsmetana@redhat.com> 3.7.6-1
 - new upstream version
 - fix #248565 logrotate never rotates /var/log/btmp
