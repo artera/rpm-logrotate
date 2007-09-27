@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.6
-Release: 1.2%{?dist}
+Release: 1.3%{?dist}
 License: GPL+
 Group: System Environment/Base
 # The source for this package was pulled from cvs.
@@ -13,7 +13,7 @@ Group: System Environment/Base
 #  make create-archive
 Source: logrotate-%{version}.tar.gz
 Requires: coreutils >= 5.92 libsepol libselinux popt
-BuildRequires: libselinux-devel popt
+BuildRequires: libselinux-devel popt-devel
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
@@ -58,6 +58,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Thu Sep 27 2007 Tomas Smetana <tsmetana@redhat.com> 3.7.6-1.3
+- popt-devel dependency was still missing
+
 * Thu Sep 27 2007 Tomas Smetana <tsmetana@redhat.com> 3.7.6-1.2
 - add missing dependencies to spec file
 
