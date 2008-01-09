@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.6
-Release: 1.3%{?dist}
+Release: 2%{?dist}
 License: GPL+
 Group: System Environment/Base
 # The source for this package was pulled from cvs.
@@ -12,6 +12,7 @@ Group: System Environment/Base
 #  cd logrotate
 #  make create-archive
 Source: logrotate-%{version}.tar.gz
+Patch1: logrotate-3.7.6-selinux.patch
 Requires: coreutils >= 5.92 libsepol libselinux popt
 BuildRequires: libselinux-devel popt-devel
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -29,6 +30,7 @@ log files on your system.
 
 %prep
 %setup -q
+%patch1 -p1 -b .selinux
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes
@@ -58,6 +60,10 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Wed Jan 09 2008 Tomas Smetana <tsmetana@redhat.com> 3.7.6-2
+- fix #427274 - logrotate fails to preserve SELinux file contexts
+- fix #427661 - SELinux stops vsftpd from working correctly
+
 * Thu Sep 27 2007 Tomas Smetana <tsmetana@redhat.com> 3.7.6-1.3
 - popt-devel dependency was still missing
 
