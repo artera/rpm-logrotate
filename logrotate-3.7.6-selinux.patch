@@ -73,9 +73,9 @@ diff -up logrotate-3.7.6/logrotate.c.selinux logrotate-3.7.6/logrotate.c
 +#ifdef WITH_SELINUX
 +	if (selinux_enabled) {
 +	    setfscreatecon_raw(savedContext);
-+	    if (prev_context != NULL) {
-+			freecon(prev_context);
-+			prev_context = NULL;
++	    if (savedContext != NULL) {
++			freecon(savedContext);
++			savedContext = NULL;
 +	    }
 +	}
 +#endif
