@@ -1,26 +1,64 @@
-Written-by: Tomas Smetana <tsmetana@redhat.com>
-
 diff -up logrotate-3.7.6/logrotate.c.selinux logrotate-3.7.6/logrotate.c
---- logrotate-3.7.6/logrotate.c.selinux	2008-01-09 09:37:16.000000000 +0100
-+++ logrotate-3.7.6/logrotate.c	2008-01-09 09:39:05.000000000 +0100
-@@ -899,6 +899,9 @@ int rotateSingleLog(logInfo * log, int l
+--- logrotate-3.7.6/logrotate.c.selinux	2007-08-07 09:14:35.000000000 +0200
++++ logrotate-3.7.6/logrotate.c	2008-01-21 09:32:56.000000000 +0100
+@@ -409,15 +409,17 @@ static int copyTruncate(char *currLog, c
+ 	}
+ #ifdef WITH_SELINUX
+ 	if (selinux_enabled) {
+-	    security_context_t oldContext;
++	    security_context_t oldContext = NULL;
+ 	    if (fgetfilecon_raw(fdcurr, &oldContext) >= 0) {
+ 		if (getfscreatecon_raw(&prev_context) < 0) {
+ 		    message(MESS_ERROR,
+ 			    "getting default context: %s\n",
+ 			    strerror(errno));
+ 		    if (selinux_enforce) {
+-			freecon(oldContext);
+-			return 1;
++				if (oldContext != NULL) {
++					freecon(oldContext);
++				}
++				return 1;
+ 		    }
+ 		}
+ 		if (setfscreatecon_raw(oldContext) < 0) {
+@@ -425,11 +427,15 @@ static int copyTruncate(char *currLog, c
+ 			    "setting file context %s to %s: %s\n",
+ 			    saveLog, oldContext, strerror(errno));
+ 		    if (selinux_enforce) {
+-			freecon(oldContext);
+-			return 1;
++				if (oldContext != NULL) {
++					freecon(oldContext);
++				}
++				return 1;
+ 		    }
+ 		}
+-		freecon(oldContext);
++		if (oldContext != NULL) {
++			freecon(oldContext);
++		}
+ 	    } else {
+ 		    if (errno != ENOTSUP) {
+ 			    message(MESS_ERROR, "getting file context %s: %s\n",
+@@ -899,6 +905,9 @@ int rotateSingleLog(logInfo * log, int l
      int hasErrors = 0;
      struct stat sb;
      int fd;
 +#ifdef WITH_SELINUX
-+	security_context_t savedContext;
++	security_context_t savedContext = NULL;
 +#endif
  
      if (!state->doRotate)
  	return 0;
-@@ -906,7 +909,51 @@ int rotateSingleLog(logInfo * log, int l
+@@ -906,7 +915,57 @@ int rotateSingleLog(logInfo * log, int l
      if (!hasErrors) {
  
  	if (!(log->flags & (LOG_FLAG_COPYTRUNCATE | LOG_FLAG_COPY))) {
 -	    message(MESS_DEBUG, "renaming %s to %s\n", log->files[logNum],
 +#ifdef WITH_SELINUX
 +		if (selinux_enabled) {
-+			security_context_t oldContext;
++			security_context_t oldContext = NULL;
 +			int fdcurr = -1;
 +
 +			if ((fdcurr = open(log->files[logNum], O_RDWR)) < 0) {
@@ -35,7 +73,9 @@ diff -up logrotate-3.7.6/logrotate.c.selinux logrotate-3.7.6/logrotate.c
 +						"getting default context: %s\n",
 +						strerror(errno));
 +					if (selinux_enforce) {
-+						freecon(oldContext);
++						if (oldContext != NULL) {
++							freecon(oldContext);
++						}
 +						return 1;
 +					}
 +				}
@@ -44,13 +84,17 @@ diff -up logrotate-3.7.6/logrotate.c.selinux logrotate-3.7.6/logrotate.c
 +						"setting file context %s to %s: %s\n",
 +						log->files[logNum], oldContext, strerror(errno));
 +					if (selinux_enforce) {
-+					freecon(oldContext);
-+					return 1;
++						if (oldContext != NULL) {
++							freecon(oldContext);
++						}
++						return 1;
 +					}
 +				}
 +				message(MESS_DEBUG, "fscreate context set to %s\n",
 +						oldContext);
-+				freecon(oldContext);
++				if (oldContext != NULL) {
++					freecon(oldContext);
++				}
 +			} else {
 +				if (errno != ENOTSUP) {
 +					message(MESS_ERROR, "getting file context %s: %s\n",
@@ -66,7 +110,7 @@ diff -up logrotate-3.7.6/logrotate.c.selinux logrotate-3.7.6/logrotate.c
  		    rotNames->finalName);
  
  	    if (!debug && !hasErrors &&
-@@ -961,6 +1008,15 @@ int rotateSingleLog(logInfo * log, int l
+@@ -961,6 +1020,15 @@ int rotateSingleLog(logInfo * log, int l
                      close(fd);
  	    }
  	}

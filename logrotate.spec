@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.6
-Release: 2.1%{?dist}
+Release: 2.2%{?dist}
 License: GPL+
 Group: System Environment/Base
 # The source for this package was pulled from cvs.
@@ -60,6 +60,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Mon Jan 21 2008 Tomas Smetana <tsmetana@redhat.com> 3.7.6-2.2
+- fix #429454 - logrotate fails due to invalid pointer
+
 * Wed Jan 09 2008 Tomas Smetana <tsmetana@redhat.com> 3.7.6-2.1
 - fix the selinux patch
 
