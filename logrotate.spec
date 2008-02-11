@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.6
-Release: 2.2%{?dist}
+Release: 3%{?dist}
 License: GPL+
 Group: System Environment/Base
 # The source for this package was pulled from cvs.
@@ -13,6 +13,8 @@ Group: System Environment/Base
 #  make create-archive
 Source: logrotate-%{version}.tar.gz
 Patch1: logrotate-3.7.6-selinux.patch
+Patch2: logrotate-3.7.6-segfault.patch
+
 Requires: coreutils >= 5.92 libsepol libselinux popt
 BuildRequires: libselinux-devel popt-devel
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -31,6 +33,7 @@ log files on your system.
 %prep
 %setup -q
 %patch1 -p1 -b .selinux
+%patch2 -p1 -b .segfault
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes
@@ -60,6 +63,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Mon Feb 11 2008 Tomas Smetana <tsmetana@redhat.com> 3.7.6-3
+- fix #432330 segfault on corrupted status file
+
 * Mon Jan 21 2008 Tomas Smetana <tsmetana@redhat.com> 3.7.6-2.2
 - fix #429454 - logrotate fails due to invalid pointer
 
