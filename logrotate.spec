@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.6
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL+
 Group: System Environment/Base
 # The source for this package was pulled from cvs.
@@ -63,6 +63,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Wed Apr 23 2008 Tomas Smetana <tsmetana@redhat.com> 3.7.6-4
+- improve patch for #432330
+
 * Mon Feb 11 2008 Tomas Smetana <tsmetana@redhat.com> 3.7.6-3
 - fix #432330 segfault on corrupted status file
 

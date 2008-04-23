@@ -1,52 +1,11 @@
 diff -up logrotate-3.7.6/logrotate.c.segfault logrotate-3.7.6/logrotate.c
---- logrotate-3.7.6/logrotate.c.segfault	2008-02-11 11:33:52.000000000 +0100
-+++ logrotate-3.7.6/logrotate.c	2008-02-11 11:34:59.000000000 +0100
-@@ -1325,7 +1325,7 @@ static int readState(char *stateFilename
- {
-     FILE *f;
-     char buf[1024];
--    const char **argv;
-+    const char **argv = NULL;
-     int argc;
-     int year, month, day;
-     int i;
-@@ -1409,7 +1409,8 @@ static int readState(char *stateFilename
- 	    message(MESS_ERROR,
- 		    "bad year %d for file %s in state file %s\n", year,
- 		    argv[0], stateFilename);
--	    free(argv);
-+	    if(argv)
-+			free(argv);
- 	    fclose(f);
- 	    return 1;
- 	}
-@@ -1418,7 +1419,8 @@ static int readState(char *stateFilename
- 	    message(MESS_ERROR,
- 		    "bad month %d for file %s in state file %s\n", month,
- 		    argv[0], stateFilename);
--	    free(argv);
-+	    if(argv)
-+			free(argv);
- 	    fclose(f);
- 	    return 1;
- 	}
-@@ -1428,7 +1430,8 @@ static int readState(char *stateFilename
- 	    message(MESS_ERROR,
- 		    "bad day %d for file %s in state file %s\n", day,
- 		    argv[0], stateFilename);
--	    free(argv);
-+	    if(argv)
-+			free(argv);
- 	    fclose(f);
- 	    return 1;
- 	}
-@@ -1445,7 +1448,8 @@ static int readState(char *stateFilename
- 	lr_time = mktime(&st->lastRotated);
- 	st->lastRotated = *localtime(&lr_time);
+--- logrotate-3.7.6/logrotate.c.segfault	2008-04-23 14:40:51.000000000 +0200
++++ logrotate-3.7.6/logrotate.c	2008-04-23 14:41:14.000000000 +0200
+@@ -1380,6 +1380,7 @@ static int readState(char *stateFilename
+     line++;
  
--	free(argv);
-+	if(argv)
-+		free(argv);
-     }
- 
-     fclose(f);
+     while (fgets(buf, sizeof(buf) - 1, f)) {
++	argv = NULL;
+ 	line++;
+ 	i = strlen(buf);
+ 	if (buf[i - 1] != '\n') {
