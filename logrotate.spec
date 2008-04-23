@@ -14,6 +14,7 @@ Group: System Environment/Base
 Source: logrotate-%{version}.tar.gz
 Patch1: logrotate-3.7.6-selinux.patch
 Patch2: logrotate-3.7.6-segfault.patch
+Patch3: logrotate-3.7.6-fdclose.patch
 
 Requires: coreutils >= 5.92 libsepol libselinux popt
 BuildRequires: libselinux-devel popt-devel
@@ -34,6 +35,7 @@ log files on your system.
 %setup -q
 %patch1 -p1 -b .selinux
 %patch2 -p1 -b .segfault
+%patch3 -p1 -b .fdclose
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes
@@ -65,6 +67,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Wed Apr 23 2008 Tomas Smetana <tsmetana@redhat.com> 3.7.6-4
 - improve patch for #432330
+- fix #437748 - don't forget to close log files
 
 * Mon Feb 11 2008 Tomas Smetana <tsmetana@redhat.com> 3.7.6-3
 - fix #432330 segfault on corrupted status file
