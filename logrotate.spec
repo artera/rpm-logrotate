@@ -1,20 +1,10 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.7.6
-Release: 4%{?dist}
+Version: 3.7.7
+Release: 1%{?dist}
 License: GPL+
 Group: System Environment/Base
-# The source for this package was pulled from cvs.
-# Use the following commands to generate the tarball:
-#  export CVSROOT=:pserver:anonymous@rhlinux.redhat.com:/usr/local/CVS
-#  cvs login (hit return)
-#  cvs co logrotate
-#  cd logrotate
-#  make create-archive
-Source: logrotate-%{version}.tar.gz
-Patch1: logrotate-3.7.6-selinux.patch
-Patch2: logrotate-3.7.6-segfault.patch
-Patch3: logrotate-3.7.6-fdclose.patch
+Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
 
 Requires: coreutils >= 5.92 libsepol libselinux popt
 BuildRequires: libselinux-devel popt-devel
@@ -33,9 +23,6 @@ log files on your system.
 
 %prep
 %setup -q
-%patch1 -p1 -b .selinux
-%patch2 -p1 -b .segfault
-%patch3 -p1 -b .fdclose
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes
@@ -65,6 +52,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Mon May 19 2008 Tomas Smetana <tsmetana@redhat.com> 3.7.7-1
+- new upstream version
+
 * Wed Apr 23 2008 Tomas Smetana <tsmetana@redhat.com> 3.7.6-4
 - improve patch for #432330
 - fix #437748 - don't forget to close log files
