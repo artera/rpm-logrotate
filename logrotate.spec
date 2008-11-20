@@ -1,11 +1,11 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.7
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL+
 Group: System Environment/Base
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
-Patch1: logrotate-3.7.7-curdir.patch
+Patch1: logrotate-3.7.7-curdir2.patch
 
 Requires: coreutils >= 5.92 libsepol libselinux popt
 BuildRequires: libselinux-devel popt-devel
@@ -54,6 +54,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Thu Nov 20 2008 Daniel Novotny <dnovotny@redhat.com> 3.7.7-3
+- less aggressive approach to the fix
+
 * Thu Nov 20 2008 Daniel Novotny <dnovotny@redhat.com> 3.7.7-2
 - fix #471463 (selinux problems with logrotate)
 
