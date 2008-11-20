@@ -1,0 +1,71 @@
+diff -up logrotate-3.7.7/config.c.curdir logrotate-3.7.7/config.c
+--- logrotate-3.7.7/config.c.curdir	2008-11-20 14:50:29.000000000 +0100
++++ logrotate-3.7.7/config.c	2008-11-20 14:51:35.000000000 +0100
+@@ -301,7 +301,7 @@ static void freeTailLogs(int num)
+ static int readConfigPath(const char *path, struct logInfo *defConfig)
+ {
+     struct stat sb;
+-    int here, oldnumlogs, result = 1;
++    int  oldnumlogs, result = 1;
+ 	struct logInfo defConfigBackup;
+ 
+     if (stat(path, &sb)) {
+@@ -315,17 +315,10 @@ static int readConfigPath(const char *pa
+ 	int files_count, i;
+ 	DIR *dirp;
+ 
+-	here = open(".", O_RDONLY);
+-	if (here < 0) {
+-	    message(MESS_ERROR, "cannot open current directory: %s\n",
+-		    strerror(errno));
+-	    return 1;
+-	}
+ 
+ 	if ((dirp = opendir(path)) == NULL) {
+ 	    message(MESS_ERROR, "cannot open directory %s: %s\n", path,
+ 		    strerror(errno));
+-	    close(here);
+ 	    return 1;
+ 	}
+ 	files_count = 0;
+@@ -344,7 +337,6 @@ static int readConfigPath(const char *pa
+ 		    } else {
+ 			free_2d_array(namelist, files_count);
+ 			closedir(dirp);
+-			close(here);
+ 			message(MESS_ERROR, "cannot realloc: %s\n",
+ 				strerror(errno));
+ 			return 1;
+@@ -358,7 +350,6 @@ static int readConfigPath(const char *pa
+ 		} else {
+ 		    free_2d_array(namelist, files_count);
+ 		    closedir(dirp);
+-		    close(here);
+ 		    message(MESS_ERROR, "cannot realloc: %s\n",
+ 			    strerror(errno));
+ 		    return 1;
+@@ -370,14 +361,12 @@ static int readConfigPath(const char *pa
+ 	if (files_count > 0) {
+ 	    qsort(namelist, files_count, sizeof(char *), compar);
+ 	} else {
+-	    close(here);
+ 	    return 0;
+ 	}
+ 
+ 	if (chdir(path)) {
+ 	    message(MESS_ERROR, "error in chdir(\"%s\"): %s\n", path,
+ 		    strerror(errno));
+-	    close(here);
+ 	    free_2d_array(namelist, files_count);
+ 	    return 1;
+ 	}
+@@ -399,8 +388,7 @@ static int readConfigPath(const char *pa
+ 	    freeLogInfo(&defConfigBackup);
+ 	}
+ 
+-	fchdir(here);
+-	close(here);
++	chdir(".");
+ 	free_2d_array(namelist, files_count);
+     } else {
+     	oldnumlogs = numLogs;
