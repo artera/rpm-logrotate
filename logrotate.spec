@@ -1,11 +1,12 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.7
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL+
 Group: System Environment/Base
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
 Patch1: logrotate-3.7.7-curdir2.patch
+Patch2: logrotate-3.7.7-toolarge.patch
 
 Requires: coreutils >= 5.92 libsepol libselinux popt
 BuildRequires: libselinux-devel popt-devel
@@ -25,6 +26,7 @@ log files on your system.
 %prep
 %setup -q
 %patch1 -p1 -b .curdir
+%patch2 -p1 -b .toolarge
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes
@@ -54,6 +56,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Fri Nov 21 2008 Daniel Novotny <dnovotny@redhat.com> 3.7.7-4
+- fix #468926 (segfault with very large /var/log/messages)
+
 * Thu Nov 20 2008 Daniel Novotny <dnovotny@redhat.com> 3.7.7-3
 - less aggressive approach to the fix
 
