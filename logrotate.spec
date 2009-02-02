@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.7.7
-Release: 4%{?dist}
+Version: 3.7.8
+Release: 1%{?dist}
 License: GPL+
 Group: System Environment/Base
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
@@ -56,6 +56,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Mon Feb 02 2009 Daniel Novotny <dnovotny@redhat.com> 3.7.8-1
+- new upstream version 3.7.8
+
 * Fri Nov 21 2008 Daniel Novotny <dnovotny@redhat.com> 3.7.7-4
 - fix #468926 (segfault with very large /var/log/messages)
 
