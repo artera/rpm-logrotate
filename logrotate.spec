@@ -1,12 +1,13 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.8
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL+
 Group: System Environment/Base
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
 Patch1: logrotate-3.7.7-curdir2.patch
 Patch2: logrotate-3.7.7-toolarge.patch
+Patch3: logrotate-3.7.8-devnull.patch
 
 Requires: coreutils >= 5.92 libsepol libselinux popt
 BuildRequires: libselinux-devel popt-devel
@@ -27,6 +28,7 @@ log files on your system.
 %setup -q
 %patch1 -p1 -b .curdir
 %patch2 -p1 -b .toolarge
+%patch3 -p1 -b .devnull
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes
@@ -56,6 +58,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Thu Sep 17 2009 Daniel Novotny <dnovotny@redhat.com> 3.7.8-4
+- fix #517321 (logrotate blocking anacron)
+
 * Sat Jul 25 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.7.8-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 
