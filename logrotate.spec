@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.8
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: GPL+
 Group: System Environment/Base
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
@@ -10,6 +10,7 @@ Patch2: logrotate-3.7.7-toolarge.patch
 Patch3: logrotate-3.7.8-devnull.patch
 Patch4: logrotate-3.7.8-man5.patch
 Patch5: logrotate-3.7.8-readonly.patch
+Patch6: logrotate-3.7.8-perm.patch
 
 Requires: coreutils >= 5.92 libsepol libselinux popt
 BuildRequires: libselinux-devel popt-devel
@@ -33,6 +34,7 @@ log files on your system.
 %patch3 -p1 -b .devnull
 %patch4 -p1 -b .man5
 %patch5 -p1 -b .readonly
+%patch6 -p1 -b .perm
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes
@@ -63,6 +65,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Mon Jan 11 2010 Daniel Novotny <dnovotny@redhat.com> 3.7.8-7
+- fix #489038 -  RFE: useful permissions on log files
+
 * Wed Dec 09 2009 Henrique Martins <bugzilla-redhat-2009@martins.cc> 3.7.8-6
 - fix #545919 (rotate non-writable files when copy is set)
 
