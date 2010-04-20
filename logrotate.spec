@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.8
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPL+
 Group: System Environment/Base
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
@@ -10,7 +10,7 @@ Patch2: logrotate-3.7.7-toolarge.patch
 Patch3: logrotate-3.7.8-devnull.patch
 Patch4: logrotate-3.7.8-man5.patch
 Patch5: logrotate-3.7.8-readonly.patch
-Patch6: logrotate-3.7.8-perm.patch
+#Patch6: logrotate-3.7.8-perm.patch
 Patch7: logrotate-3.7.8-missingok.patch
 
 Requires: coreutils >= 5.92 libsepol libselinux popt
@@ -35,7 +35,7 @@ log files on your system.
 %patch3 -p1 -b .devnull
 %patch4 -p1 -b .man5
 %patch5 -p1 -b .readonly
-%patch6 -p1 -b .perm
+#%%patch6 -p1 -b .perm
 %patch7 -p1 -b .missingok
 
 %build
@@ -67,6 +67,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Tue Apr 20 2010 Daniel Novotny <dnovotny@redhat.com> 3.7.8-9
+- revert the "create 0640 root adm" permission change (#489038)
+
 * Tue Apr 06 2010 Daniel Novotny <dnovotny@redhat.com> 3.7.8-8
 - fix #578115 - missingok problem with globs
 
