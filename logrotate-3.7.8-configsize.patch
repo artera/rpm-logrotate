@@ -1,0 +1,42 @@
+Index: /trunk/logrotate.c
+===================================================================
+--- /trunk/logrotate.c (revision 273)
++++ /trunk/logrotate.c (revision 276)
+@@ -1199,5 +1199,5 @@
+     switch (log->criterium) {
+     case ROT_DAYS:
+-	message(MESS_DEBUG, "after %d days ", log->threshhold);
++	message(MESS_DEBUG, "after %llu days ", log->threshhold);
+ 	break;
+     case ROT_WEEKLY:
+@@ -1211,5 +1211,5 @@
+ 	break;
+     case ROT_SIZE:
+-	message(MESS_DEBUG, "%d bytes ", log->threshhold);
++	message(MESS_DEBUG, "%llu bytes ", log->threshhold);
+ 	break;
+     case ROT_FORCE:
+Index: /trunk/logrotate.h
+===================================================================
+--- /trunk/logrotate.h (revision 248)
++++ /trunk/logrotate.h (revision 276)
+@@ -34,6 +34,6 @@
+     enum { ROT_DAYS, ROT_WEEKLY, ROT_MONTHLY, ROT_YEARLY, ROT_SIZE,
+ 	    ROT_FORCE } criterium;
+-    unsigned int threshhold;
+-    unsigned int minsize;
++    unsigned long long threshhold;
++    unsigned long long minsize;
+     int rotateCount;
+     int rotateAge;
+Index: /trunk/config.c
+===================================================================
+--- /trunk/config.c (revision 274)
++++ /trunk/config.c (revision 276)
+@@ -794,5 +794,5 @@
+ 		*endtag = oldchar, start = endtag;
+ 	    } else if (!strcmp(start, "size") || !strcmp(start, "minsize")) {
+-		unsigned int size = 0;
++		unsigned long long size = 0;
+ 		char *opt = start;
+ 		*endtag = oldchar, start = endtag;
