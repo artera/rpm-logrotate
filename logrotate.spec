@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.8
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: GPL+
 Group: System Environment/Base
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
@@ -13,6 +13,7 @@ Patch5: logrotate-3.7.8-readonly.patch
 #Patch6: logrotate-3.7.8-perm.patch
 Patch7: logrotate-3.7.8-missingok.patch
 Patch8: logrotate-3.7.8-configsize.patch
+Patch9: logrotate-3.7.8-dont-remove-log.patch
 
 Requires: coreutils >= 5.92 libsepol libselinux popt
 BuildRequires: libselinux-devel popt-devel
@@ -39,6 +40,7 @@ log files on your system.
 #%%patch6 -p1 -b .perm
 %patch7 -p1 -b .missingok
 %patch8 -p2 -b .configsize
+%patch9 -b dont-remove-log.patch
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes
@@ -69,6 +71,10 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Tue Jun 15 2010 Jan Kaluza <jkaluza@redhat.com> 3.7.8-11
+- fix #603040 - do not remove log if there is an error in
+  rotate process
+
 * Tue Apr 20 2010 Jan Kaluza <jkaluza@redhat.com> 3.7.8-10
 - fix #602643 - logrotate "size" directive cannot exceed
   1895825408 bytes
