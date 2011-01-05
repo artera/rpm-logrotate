@@ -1,16 +1,18 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.9
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPL+
 Group: System Environment/Base
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
 Patch1: logrotate-3.7.8-man-authors.patch
 Patch2: logrotate-3.7.9-man-size.patch
 Patch3: logrotate-3.7.9-man-page.patch
+Patch4: logrotate-3.7.9-config.patch
+Patch5: logrotate-3.7.9-acl.patch
 
-Requires: coreutils >= 5.92 libsepol libselinux popt
-BuildRequires: libselinux-devel popt-devel
+Requires: coreutils >= 5.92 libsepol libselinux popt libacl
+BuildRequires: libselinux-devel popt-devel libacl-devel
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
@@ -29,9 +31,11 @@ log files on your system.
 %patch1 -p2
 %patch2
 %patch3 -p1
+%patch4
+%patch5 -p2
 
 %build
-make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes
+make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes WITH_ACL=yes
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -59,6 +63,10 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Wed Dec 15 2010 Jan Kaluza <jkaluza@redhat.com> 3.7.9-5
+- fix #661181 - fixed SIGBUS when config file is empty or 4096 bytes
+- fix #666677 - preserve ACLs when rotating files
+
 * Tue Oct 19 2010 Jan Kaluza <jkaluza@redhat.com> 3.7.9-4
 - fix #644309 - mention all logrotate params in man page
 
