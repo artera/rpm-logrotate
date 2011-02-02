@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.9
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: GPL+
 Group: System Environment/Base
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
@@ -10,6 +10,7 @@ Patch2: logrotate-3.7.9-man-size.patch
 Patch3: logrotate-3.7.9-man-page.patch
 Patch4: logrotate-3.7.9-config.patch
 Patch5: logrotate-3.7.9-acl.patch
+Patch6: logrotate-3.7.9-tabooext.patch
 
 Requires: coreutils >= 5.92 libsepol libselinux popt libacl
 BuildRequires: libselinux-devel popt-devel libacl-devel
@@ -33,6 +34,7 @@ log files on your system.
 %patch3 -p1
 %patch4
 %patch5 -p2
+%patch6 -p1
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes WITH_ACL=yes
@@ -63,6 +65,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Wed Feb 02 2011 Jan Kaluza <jkaluza@redhat.com> 3.7.9-6
+- fix #671926 - fixed crash when tabooext is used in config file
+
 * Wed Dec 15 2010 Jan Kaluza <jkaluza@redhat.com> 3.7.9-5
 - fix #661181 - fixed SIGBUS when config file is empty or 4096 bytes
 - fix #666677 - preserve ACLs when rotating files
