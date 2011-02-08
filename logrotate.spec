@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.9
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: GPL+
 Group: System Environment/Base
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
@@ -65,6 +65,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.7.9-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
 * Wed Feb 02 2011 Jan Kaluza <jkaluza@redhat.com> 3.7.9-6
 - fix #671926 - fixed crash when tabooext is used in config file
 
