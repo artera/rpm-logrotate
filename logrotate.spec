@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.9
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: GPL+
 Group: System Environment/Base
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
@@ -11,6 +11,9 @@ Patch3: logrotate-3.7.9-man-page.patch
 Patch4: logrotate-3.7.9-config.patch
 Patch5: logrotate-3.7.9-acl.patch
 Patch6: logrotate-3.7.9-tabooext.patch
+Patch7: logrotate-3.7.9-shred.patch
+Patch8: logrotate-3.7.9-statefile.patch
+Patch9: logrotate-3.7.9-atomic-create.patch 
 
 Requires: coreutils >= 5.92 libsepol libselinux popt libacl
 BuildRequires: libselinux-devel popt-devel libacl-devel
@@ -35,6 +38,9 @@ log files on your system.
 %patch4
 %patch5 -p2
 %patch6 -p1
+%patch7
+%patch8
+%patch9 -p1
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes WITH_ACL=yes
@@ -65,6 +71,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Mon Mar 21 2011 Jan Kaluza <jkaluza@redhat.com> 3.7.9-8
+- fix #688520 - fixed CVE-2011-1154, CVE-2011-1155 and CVE-2011-1098
+
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.7.9-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
