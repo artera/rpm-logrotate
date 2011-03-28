@@ -1,9 +1,10 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.9
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPL+
 Group: System Environment/Base
+Url: https://fedorahosted.org/logrotate/
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
 Patch1: logrotate-3.7.8-man-authors.patch
 Patch2: logrotate-3.7.9-man-size.patch
@@ -71,6 +72,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Mon Mar 28 2011 Jan Kaluza <jkaluza@redhat.com> 3.7.9-9
+- fix #689061 - added Url 
+
 * Mon Mar 21 2011 Jan Kaluza <jkaluza@redhat.com> 3.7.9-8
 - fix #688520 - fixed CVE-2011-1154, CVE-2011-1155 and CVE-2011-1098
 
