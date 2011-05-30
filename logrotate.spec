@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.7.9
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: GPL+
 Group: System Environment/Base
 Url: https://fedorahosted.org/logrotate/
@@ -15,6 +15,7 @@ Patch6: logrotate-3.7.9-tabooext.patch
 Patch7: logrotate-3.7.9-shred.patch
 Patch8: logrotate-3.7.9-statefile.patch
 Patch9: logrotate-3.7.9-atomic-create.patch 
+Patch10: logrotate-3.7.9-address-parsing.patch
 
 Requires: coreutils >= 5.92 libsepol libselinux popt libacl
 BuildRequires: libselinux-devel popt-devel libacl-devel
@@ -42,6 +43,7 @@ log files on your system.
 %patch7
 %patch8
 %patch9 -p1
+%patch10
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes WITH_ACL=yes
@@ -72,6 +74,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Mon May 30 2011 Jan Kaluza <jkaluza@redhat.com> 3.7.9-10
+- fix #708367 - fixed mail directive parsing
+
 * Mon Mar 28 2011 Jan Kaluza <jkaluza@redhat.com> 3.7.9-9
 - fix #689061 - added Url 
 
