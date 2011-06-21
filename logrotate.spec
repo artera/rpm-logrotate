@@ -1,22 +1,11 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.7.9
-Release: 11%{?dist}
+Version: 3.8.0
+Release: 1%{?dist}
 License: GPL+
 Group: System Environment/Base
 Url: https://fedorahosted.org/logrotate/
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
-Patch1: logrotate-3.7.8-man-authors.patch
-Patch2: logrotate-3.7.9-man-size.patch
-Patch3: logrotate-3.7.9-man-page.patch
-Patch4: logrotate-3.7.9-config.patch
-Patch5: logrotate-3.7.9-acl.patch
-Patch6: logrotate-3.7.9-tabooext.patch
-Patch7: logrotate-3.7.9-shred.patch
-Patch8: logrotate-3.7.9-statefile.patch
-Patch9: logrotate-3.7.9-atomic-create.patch 
-Patch10: logrotate-3.7.9-address-parsing.patch
-Patch11: logrotate-3.7.9-support-no-acls.patch
 
 Requires: coreutils >= 5.92 libsepol libselinux popt libacl
 BuildRequires: libselinux-devel popt-devel libacl-devel
@@ -35,17 +24,6 @@ log files on your system.
 
 %prep
 %setup -q
-%patch1 -p2
-%patch2
-%patch3 -p1
-%patch4
-%patch5 -p2
-%patch6 -p1
-%patch7
-%patch8
-%patch9 -p1
-%patch10
-%patch11
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes WITH_ACL=yes
@@ -76,6 +54,10 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Tue Jun 21 2011 Jan Kaluza <jkaluza@redhat.com> 3.8.0-1
+- new upstream version 3.8.0
+- removed unused patches
+
 * Tue May 31 2011 Jan Kaluza <jkaluza@redhat.com> 3.7.9-11
 - fix #709034 - work properly when ACLs are not supported
 
