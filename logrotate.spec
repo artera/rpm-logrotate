@@ -1,15 +1,11 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.8.0
-Release: 5%{?dist}
+Version: 3.8.1
+Release: 1%{?dist}
 License: GPL+
 Group: System Environment/Base
 Url: https://fedorahosted.org/logrotate/
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
-Patch0: logrotate-3.8.0-no-cron-redirection.patch
-Patch1: logrotate-3.8.0-rot-size.patch
-Patch2: logrotate-3.8.0-handle-acl-not-supported.patch
-Patch3: logrotate-3.8.0-maxsize.patch
 
 Requires: coreutils >= 5.92 libsepol libselinux popt libacl
 BuildRequires: libselinux-devel popt-devel libacl-devel
@@ -28,11 +24,6 @@ log files on your system.
 
 %prep
 %setup -q
-
-%patch0 -p1
-%patch1 -p1
-%patch2
-%patch3
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes WITH_ACL=yes
@@ -63,6 +54,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Tue Sep 06 2011 Jan Kaluza <jkaluza@redhat.com> 3.8.1-1
+- new upstream version 3.8.1
+
 * Mon Aug 08 2011 Jan Kaluza <jkaluza@redhat.com> 3.8.0-5
 - fix #723797 - added maxsize option
 
