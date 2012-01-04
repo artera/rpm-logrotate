@@ -1,12 +1,13 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.8.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL+
 Group: System Environment/Base
 Url: https://fedorahosted.org/logrotate/
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
 Patch1: logrotate-3.8.1-man.patch
+Patch2: logrotate-3.8.1-syntax-check.patch
 
 Requires: coreutils >= 5.92 libsepol libselinux popt libacl
 BuildRequires: libselinux-devel popt-devel libacl-devel
@@ -26,6 +27,7 @@ log files on your system.
 %prep
 %setup -q
 %patch1 -b .man
+%patch2 -p1 -b .syntax-check
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes WITH_ACL=yes
@@ -56,6 +58,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Wed Jan 04 2012 Jan Kaluza <jkaluza@redhat.com> 3.8.1-3
+- fix #736054 - check for missing '{' in config file
+
 * Mon Oct 03 2011 Jan Kaluza <jkaluza@redhat.com> 3.8.1-2
 - fix #742731 - man page syntax, formatting, and spelling fixes
 
