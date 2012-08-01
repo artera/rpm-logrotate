@@ -1,15 +1,13 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.8.1
-Release: 4%{?dist}
+Version: 3.8.2
+Release: 1%{?dist}
 License: GPL+
 Group: System Environment/Base
 Url: https://fedorahosted.org/logrotate/
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
-Patch1: logrotate-3.8.1-man.patch
-Patch2: logrotate-3.8.1-syntax-check.patch
 
-Requires: coreutils >= 5.92 libsepol libselinux popt libacl
+Requires: coreutils >= 5.92 popt
 BuildRequires: libselinux-devel popt-devel libacl-devel
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -26,11 +24,12 @@ log files on your system.
 
 %prep
 %setup -q
-%patch1 -b .man
-%patch2 -p1 -b .syntax-check
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes WITH_ACL=yes
+
+%check
+make test
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -58,6 +57,10 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Thu Jul 19 2012 Jan Kaluza <jkaluza@redhat.com> 3.8.2-1
+- new upstream version 3.8.2
+- tests are enabled during build
+
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.8.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
