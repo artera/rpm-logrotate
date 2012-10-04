@@ -1,6 +1,6 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.8.2
+Version: 3.8.3
 Release: 1%{?dist}
 License: GPL+
 Group: System Environment/Base
@@ -8,7 +8,7 @@ Url: https://fedorahosted.org/logrotate/
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
 
 Requires: coreutils >= 5.92 popt
-BuildRequires: libselinux-devel popt-devel libacl-devel
+BuildRequires: libselinux-devel popt-devel libacl-devel acl
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
@@ -57,6 +57,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Thu Oct 04 2012 Jan Kaluza <jkaluza@redhat.com> 3.8.3-1
+- new upstream version 3.8.3
+
 * Thu Jul 19 2012 Jan Kaluza <jkaluza@redhat.com> 3.8.2-1
 - new upstream version 3.8.2
 - tests are enabled during build
