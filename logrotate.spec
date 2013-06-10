@@ -1,12 +1,11 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.8.4
-Release: 2%{?dist}
+Version: 3.8.5
+Release: 1%{?dist}
 License: GPL+
 Group: System Environment/Base
 Url: https://fedorahosted.org/logrotate/
 Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
-Patch0: logrotate-3.8.4-big-config.patch
 
 Requires: coreutils >= 5.92 popt
 BuildRequires: libselinux-devel popt-devel libacl-devel acl
@@ -25,7 +24,6 @@ log files on your system.
 
 %prep
 %setup -q
-%patch0 -p1 -b .bigconfig
 
 %build
 make %{?_smp_mflags} RPM_OPT_FLAGS="$RPM_OPT_FLAGS" WITH_SELINUX=yes WITH_ACL=yes
@@ -59,6 +57,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Mon Jun 10 2013 Jan Kaluza <jkaluza@redhat.com> - 3.8.5-1
+- new upstream version 3.8.5
+
 * Tue May 14 2013 Jan Kaluza <jkaluza@redhat.com> - 3.8.4-2
 - do not try to parse config files bigger than 16MB
 - remove unused patches
