@@ -1,0 +1,102 @@
+Index: test/test-config.51.in
+===================================================================
+--- test/test-config.51.in	(revision 0)
++++ test/test-config.51.in	(revision 432)
+@@ -0,0 +1,8 @@
++/var/log/this_dir_does_not_exist/*log {
++    size 1
++    missingok
++    sharedscripts
++    prerotate
++    /usr/bin/some-program
++    endscript
++}
+Index: test/test
+===================================================================
+--- test/test	(revision 431)
++++ test/test	(working copy)
+@@ -4,7 +4,7 @@
+ SELINUX_TESTS=0
+ LOGROTATE=../logrotate
+ M="-m ./mailer"
+-S=-"s state"
++S="-s state"
+ RLR="$LOGROTATE $M $S"
+ 
+ # -- ACL - BEGIN --------------------------------
+@@ -1284,7 +1284,40 @@
+ echo "Does not have GNU Date, skipping part of this test"
+ fi
+ 
++cleanup 51
+ 
++# ------------------------------- Test 51 ------------------------------------
++# regression in 3.8.4, logrotate crashes with sharedscripts when 0 logs rotated
++preptest test.log 51 1 0
+ 
++# It's memory corruption and without something in state file, it won't crash
++# reliably. It would be better to run valgrind here and check the errors, but
++# I don't want the test-suite to depend on valgrind...
++cat > state << EOF
++logrotate state -- version 2
++"/var/log/httpd/backend_error_log" 2013-6-16
++"/var/log/tokyotyrant/*.log" 2011-5-30
++"/var/log/mailman/digest" 2011-5-30
++"/var/log/piranha/piranha-gui-access" 2011-5-30
++"/var/log/boincerr.log" 2011-5-30
++"/var/log/btmp" 2013-7-9
++"/var/log/httpd/a_log" 2011-11-15
++"/var/log/cups/*_log" 2012-7-19
++"/var/log/rabbitmq/*.log" 2011-5-30
++"/var/log/func/func.log" 2011-11-17
++"/var/log/wtmp" 2013-7-9
++"/var/log/glusterfs/*glusterd.vol.log" 2011-11-17
++"/var/log/imapd.log" 2011-5-30
++"/var/log/cobbler/cobbler.log" 2011-11-6
++"/var/log/httpd/ssl_access_log" 2013-3-27
++"/var/log/mrepo.log" 2011-5-30
++EOF
+ 
++$RLR test-config.51
++
++if [ $? != 0 ]; then
++	echo "logrotate ended with non-zero exit code (probably crashed)"
++	exit 3
++fi
++
+ cleanup
+Index: logrotate.c
+===================================================================
+--- logrotate.c	(revision 431)
++++ logrotate.c	(working copy)
+@@ -1601,6 +1601,11 @@
+ 	message(MESS_DEBUG, "old logs are removed\n");
+     }
+ 
++	if (log->numFiles == 0) {
++		message(MESS_DEBUG, "No logs found. Rotation not needed.\n");
++		return 0;
++	}
++
+ 	if (log->flags & LOG_FLAG_SU) {
+ 		if (switch_user(log->suUid, log->suGid) != 0) {
+ 			return 1;
+@@ -1657,7 +1662,6 @@
+ 	    hasErrors |= logHasErrors[i];
+ 	}
+ 
+-	/* (nemam chyby nebo shared) a (nemam chyby nebo nonshared) */
+ 	if (log->pre
+ 	    && (!logHasErrors[j] || log->flags & LOG_FLAG_SHAREDSCRIPTS) &&
+ 		   ((!hasErrors && state[j]->doRotate) || (!(log->flags & LOG_FLAG_SHAREDSCRIPTS) && state[j]->doRotate) ) ) {
+Index: CHANGES
+===================================================================
+--- CHANGES	(revision 431)
++++ CHANGES	(working copy)
+@@ -1,3 +1,6 @@
++3.8.5 -> 
++	- Fixed memory corruption caused by rotation directory which does not
++	  exist with "sharedscripts" together with "prerotate" script.
+ 3.8.4 -> 3.8.5
+ 	- Improved rotation during daylight saving time and between timezone
+ 	  changes.
