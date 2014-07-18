@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.8.7
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL+
 Group: System Environment/Base
 Url: https://fedorahosted.org/logrotate/
@@ -47,7 +47,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%doc CHANGES COPYING
+%{!?_licensedir:%global license %%doc}
+%license COPYING
+%doc CHANGES
 %attr(0755, root, root) %{_sbindir}/logrotate
 %attr(0644, root, root) %{_mandir}/man8/logrotate.8*
 %attr(0644, root, root) %{_mandir}/man5/logrotate.conf.5*
@@ -57,6 +59,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Fri Jul 18 2014 Tom Callaway <spot@fedoraproject.org> - 3.8.7-3
+- fix license handling
+
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.8.7-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
