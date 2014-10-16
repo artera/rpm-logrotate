@@ -52,7 +52,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%doc CHANGES COPYING
+%{!?_licensedir:%global license %%doc}
+%license COPYING
+%doc CHANGES
 %attr(0755, root, root) %{_sbindir}/logrotate
 %attr(0644, root, root) %{_mandir}/man8/logrotate.8*
 %attr(0644, root, root) %{_mandir}/man5/logrotate.conf.5*
@@ -64,6 +66,12 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Thu Oct 16 2014 Jan Kaluza <jkaluza@redhat.com> - 3.8.8-1
 - new upstream version 3.8.8
+
+* Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.8.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
+* Fri Jul 18 2014 Tom Callaway <spot@fedoraproject.org> - 3.8.7-3
+- fix license handling
 
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.8.7-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
