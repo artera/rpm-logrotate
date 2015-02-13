@@ -1,6 +1,6 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.8.8
+Version: 3.8.9
 Release: 1%{?dist}
 License: GPL+
 Group: System Environment/Base
@@ -64,6 +64,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate.status
 
 %changelog
+* Fri Feb 13 2015 Jan Kaluza <jkaluza@redhat.com> - 3.8.9-1
+- new upstream version 3.8.9
+
 * Thu Oct 16 2014 Jan Kaluza <jkaluza@redhat.com> - 3.8.8-1
 - new upstream version 3.8.8
 
