@@ -1,11 +1,11 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.9.1
-Release: 2%{?dist}
+Version: 3.9.2
+Release: 1%{?dist}
 License: GPL+
 Group: System Environment/Base
 Url: https://fedorahosted.org/logrotate/
-Source: https://fedorahosted.org/releases/l/o/logrotate/logrotate-%{version}.tar.gz
+Source: https://github.com/logrotate/logrotate/archive/logrotate-%{version}.tar.gz
 Source1: rwtab
 # Change the location of status file
 Patch0: logrotate-3.9.1-statusfile.patch
@@ -83,6 +83,10 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Wed Jan 20 2016 Jan Kaluza <jkaluza@redhat.com> - 3.9.2-1
+- new upstream version 3.9.2
+- log to syslog
+
 * Wed Jun 17 2015 Jan Kaluza <jkaluza@redhat.com> - 3.9.1-2
 - move logrotate.status to /var/lib/logrotate and add it to rwtab.d (#1127415)
 
