@@ -1,0 +1,20 @@
+--- logrotate-3.9.2/logrotate.c.orig	2016-02-16 09:54:23.360000000 +0100
++++ logrotate-3.9.2/logrotate.c	2016-02-16 09:54:26.328000000 +0100
+@@ -1784,7 +1784,7 @@
+     if (!state->doRotate)
+ 	return 0;
+ 
+-	if (!hasErrors && log->flags & LOG_FLAG_TMPFILENAME) {
++    if (!hasErrors && log->flags & LOG_FLAG_TMPFILENAME) {
+ 		char *tmpFilename = NULL;
+ 		if (asprintf(&tmpFilename, "%s%s", log->files[logNum], ".tmp") < 0) {
+ 			message(MESS_FATAL, "could not allocate tmpFilename memory\n");
+@@ -1821,7 +1821,7 @@
+ 	hasErrors = removeLogFile(rotNames->disposeName, log);
+ 
+ #ifdef WITH_SELINUX
+-	if (selinux_enabled) {
++    if (selinux_enabled) {
+ 		setfscreatecon_raw(prev_context);
+ 		freecon(prev_context);
+ 		prev_context = NULL;

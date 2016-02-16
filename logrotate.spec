@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.9.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL+
 Group: System Environment/Base
 Url: https://fedorahosted.org/logrotate/
@@ -9,6 +9,8 @@ Source: https://github.com/logrotate/logrotate/archive/logrotate-%{version}.tar.
 Source1: rwtab
 # Change the location of status file
 Patch0: logrotate-3.9.1-statusfile.patch
+# Fix indents which ends in warnings which ends in errors with gcc6
+Patch1: logrotate-3.9.1-fix-indents.patch
 
 Requires: coreutils >= 5.92 popt
 BuildRequires: libselinux-devel popt-devel libacl-devel acl
@@ -29,6 +31,7 @@ log files on your system.
 %prep
 %setup -q
 %patch0 -p1 -b .statusfile
+%patch1 -p1
 
 %build
 export CFLAGS="$RPM_OPT_FLAGS"
@@ -83,6 +86,10 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Tue Feb 16 2016 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 3.9.2-3
+- Fix code indentation to get it build with gcc6.
+- Fixed dates in changelog.
+
 * Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
@@ -159,7 +166,7 @@ rm -rf $RPM_BUILD_ROOT
 * Mon Aug 08 2011 Jan Kaluza <jkaluza@redhat.com> 3.8.0-5
 - fix #723797 - added maxsize option
 
-* Wed Aug 01 2011 Jan Kaluza <jkaluza@redhat.com> 3.8.0-4
+* Mon Aug 01 2011 Jan Kaluza <jkaluza@redhat.com> 3.8.0-4
 - fix #726980 - work properly when acl_get_fd is supported,
   but acl_set_fd is not
 
@@ -484,7 +491,7 @@ rm -rf $RPM_BUILD_ROOT
 * Thu Jul 24 2003 Elliot Lee <sopwith@redhat.com> 3.6.10-1
 - Fix #100546, change selinux port.
 
-* Wed Jul 18 2003 Dan Walsh <dwalsh@redhat.com> 3.6.9-2
+* Fri Jul 18 2003 Dan Walsh <dwalsh@redhat.com> 3.6.9-2
 - Port to SELinux 2.5
 
 * Wed Jul 09 2003 Elliot Lee <sopwith@redhat.com> 3.6.9-1
