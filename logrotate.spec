@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.9.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL+
 Group: System Environment/Base
 Url: https://fedorahosted.org/logrotate/
@@ -82,10 +82,14 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755, root, root) %{_sysconfdir}/cron.daily/logrotate
 %attr(0644, root, root) %config(noreplace) %{_sysconfdir}/logrotate.conf
 %attr(0755, root, root) %dir %{_sysconfdir}/logrotate.d
+%attr(0755, root, root) %dir %{_localstatedir}/lib/logrotate
 %attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate/logrotate.status
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Thu Jul 14 2016 Kamil Dudka <kdudka@redhat.com> - 3.9.2-4
+- make the /var/lib/logrotate directory owned by logrotate
+
 * Tue Feb 16 2016 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 3.9.2-3
 - Fix code indentation to get it build with gcc6.
 - Fixed dates in changelog.
