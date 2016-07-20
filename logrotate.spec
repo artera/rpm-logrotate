@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.9.2
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPL+
 Group: System Environment/Base
 Url: https://fedorahosted.org/logrotate/
@@ -87,6 +87,9 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Wed Jul 20 2016 Kamil Dudka <kdudka@redhat.com> - 3.9.2-5
+- do not log to syslog by default (#1304828)
+
 * Thu Jul 14 2016 Kamil Dudka <kdudka@redhat.com> - 3.9.2-4
 - make the /var/lib/logrotate directory owned by logrotate
 
