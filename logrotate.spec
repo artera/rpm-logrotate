@@ -3,7 +3,6 @@ Name: logrotate
 Version: 3.10.0
 Release: 1%{?dist}
 License: GPL+
-Group: System Environment/Base
 Url: https://github.com/logrotate/logrotate
 Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
 Source1: rwtab
@@ -11,9 +10,12 @@ Source1: rwtab
 # Change the location of status file
 Patch0: logrotate-3.9.1-statusfile.patch
 
-Requires: coreutils >= 5.92 popt
-BuildRequires: libselinux-devel popt-devel libacl-devel acl
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRequires: acl
+BuildRequires: git
+BuildRequires: libacl-devel
+BuildRequires: libselinux-devel
+BuildRequires: popt-devel
+Requires: coreutils
 
 %description
 The logrotate utility is designed to simplify the administration of
@@ -27,8 +29,7 @@ Install the logrotate package if you need a utility to deal with the
 log files on your system.
 
 %prep
-%setup -q
-%patch0 -p1 -b .statusfile
+%autosetup -S git
 
 %build
 %configure
@@ -38,8 +39,8 @@ make %{?_smp_mflags}
 make check
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
+%make_install
+
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/logrotate.d
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/cron.daily
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/logrotate
@@ -62,11 +63,7 @@ if [ ! -d %{_localstatedir}/lib/logrotate/ -a -f %{_localstatedir}/lib/logrotate
   cp -a %{_localstatedir}/lib/logrotate.status %{_localstatedir}/lib/logrotate
 fi
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %files
-%defattr(-,root,root)
 %{!?_licensedir:%global license %%doc}
 %license COPYING
 %doc CHANGES
@@ -82,6 +79,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Wed Aug 03 2016 Kamil Dudka <kdudka@redhat.com> - 3.10.0-1
+- modernize spec file
 - new upstream version 3.10.0
 
 * Wed Jul 20 2016 Kamil Dudka <kdudka@redhat.com> - 3.9.2-5
