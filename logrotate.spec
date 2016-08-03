@@ -1,20 +1,18 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.9.2
-Release: 5%{?dist}
+Version: 3.10.0
+Release: 1%{?dist}
 License: GPL+
 Group: System Environment/Base
-Url: https://fedorahosted.org/logrotate/
-Source: https://github.com/logrotate/logrotate/archive/logrotate-%{version}.tar.gz
+Url: https://github.com/logrotate/logrotate
+Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
 Source1: rwtab
+
 # Change the location of status file
 Patch0: logrotate-3.9.1-statusfile.patch
-# Fix indents which ends in warnings which ends in errors with gcc6
-Patch1: logrotate-3.9.1-fix-indents.patch
 
 Requires: coreutils >= 5.92 popt
 BuildRequires: libselinux-devel popt-devel libacl-devel acl
-BuildRequires: autoconf automake libtool
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
@@ -31,17 +29,13 @@ log files on your system.
 %prep
 %setup -q
 %patch0 -p1 -b .statusfile
-%patch1 -p1
 
 %build
-export CFLAGS="$RPM_OPT_FLAGS"
-
-./autogen.sh
 %configure
 make %{?_smp_mflags}
 
 %check
-make test
+make check
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -87,6 +81,9 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Wed Aug 03 2016 Kamil Dudka <kdudka@redhat.com> - 3.10.0-1
+- new upstream version 3.10.0
+
 * Wed Jul 20 2016 Kamil Dudka <kdudka@redhat.com> - 3.9.2-5
 - do not log to syslog by default (#1304828)
 

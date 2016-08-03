@@ -1,13 +1,1 @@
-logrotate-3.7.9.tar.gz
-/logrotate-3.8.0.tar.gz
-/logrotate-3.8.1.tar.gz
-/logrotate-3.8.2.tar.gz
-/logrotate-3.8.3.tar.gz
-/logrotate-3.8.4.tar.gz
-/logrotate-3.8.5.tar.gz
-/logrotate-3.8.6.tar.gz
-/logrotate-3.8.7.tar.gz
-/logrotate-3.8.8.tar.gz
-/logrotate-3.8.9.tar.gz
-/logrotate-3.9.1.tar.gz
-/logrotate-3.9.2.tar.gz
+/logrotate-[0-9.]*.tar.xz
