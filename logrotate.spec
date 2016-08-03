@@ -79,6 +79,7 @@ fi
 
 %changelog
 * Wed Aug 03 2016 Kamil Dudka <kdudka@redhat.com> - 3.10.0-1
+- document default state file used by logrotate cron job (#1357215)
 - modernize spec file
 - new upstream version 3.10.0
 
