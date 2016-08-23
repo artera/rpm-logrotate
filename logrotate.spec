@@ -70,7 +70,7 @@ fi
 %{_sbindir}/logrotate
 %{_mandir}/man8/logrotate.8*
 %{_mandir}/man5/logrotate.conf.5*
-%{_sysconfdir}/cron.daily/logrotate
+%{_sysconfdir}/cron.daily
 %config(noreplace) %{_sysconfdir}/logrotate.conf
 %dir %{_sysconfdir}/logrotate.d
 %dir %{_localstatedir}/lib/logrotate
@@ -79,6 +79,7 @@ fi
 
 %changelog
 * Tue Aug 23 2016 Kamil Dudka <kdudka@redhat.com> - 3.10.0-2
+- own /etc/cron.daily because no dependency of logrotate installs it
 - do not explicitly declare mode for each single installed file
 
 * Wed Aug 03 2016 Kamil Dudka <kdudka@redhat.com> - 3.10.0-1
