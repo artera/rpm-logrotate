@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.10.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPL+
 Url: https://github.com/logrotate/logrotate
 Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
@@ -67,17 +67,20 @@ fi
 %{!?_licensedir:%global license %%doc}
 %license COPYING
 %doc CHANGES
-%attr(0755, root, root) %{_sbindir}/logrotate
-%attr(0644, root, root) %{_mandir}/man8/logrotate.8*
-%attr(0644, root, root) %{_mandir}/man5/logrotate.conf.5*
-%attr(0755, root, root) %{_sysconfdir}/cron.daily/logrotate
-%attr(0644, root, root) %config(noreplace) %{_sysconfdir}/logrotate.conf
-%attr(0755, root, root) %dir %{_sysconfdir}/logrotate.d
-%attr(0755, root, root) %dir %{_localstatedir}/lib/logrotate
-%attr(0644, root, root) %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate/logrotate.status
+%{_sbindir}/logrotate
+%{_mandir}/man8/logrotate.8*
+%{_mandir}/man5/logrotate.conf.5*
+%{_sysconfdir}/cron.daily/logrotate
+%config(noreplace) %{_sysconfdir}/logrotate.conf
+%dir %{_sysconfdir}/logrotate.d
+%dir %{_localstatedir}/lib/logrotate
+%verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate/logrotate.status
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Tue Aug 23 2016 Kamil Dudka <kdudka@redhat.com> - 3.10.0-2
+- do not explicitly declare mode for each single installed file
+
 * Wed Aug 03 2016 Kamil Dudka <kdudka@redhat.com> - 3.10.0-1
 - document default state file used by logrotate cron job (#1357215)
 - modernize spec file
