@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.10.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL+
 Url: https://github.com/logrotate/logrotate
 Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
@@ -74,10 +74,13 @@ fi
 %config(noreplace) %{_sysconfdir}/logrotate.conf
 %dir %{_sysconfdir}/logrotate.d
 %dir %{_localstatedir}/lib/logrotate
-%verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate/logrotate.status
+%ghost %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate/logrotate.status
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Fri Nov 11 2016 Kamil Dudka <kdudka@redhat.com> - 3.10.0-3
+- fix migration of state file from its previous location (#1393247)
+
 * Tue Aug 23 2016 Kamil Dudka <kdudka@redhat.com> - 3.10.0-2
 - own /etc/cron.daily because no dependency of logrotate installs it
 - do not explicitly declare mode for each single installed file
