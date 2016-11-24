@@ -1,16 +1,17 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.10.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL+
 Url: https://github.com/logrotate/logrotate
 Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
 Source1: rwtab
 
-# Change the location of status file
-Patch0: logrotate-3.9.1-statusfile.patch
+# implement the --with-state-file-path option of configure (upstream patch)
+Patch0: logrotate-3.10.0-state-file-path.patch
 
 BuildRequires: acl
+BuildRequires: automake
 BuildRequires: git
 BuildRequires: libacl-devel
 BuildRequires: libselinux-devel
@@ -31,8 +32,17 @@ log files on your system.
 %prep
 %autosetup -S git
 
+printf "/autom4te.cache\n" >> .gitignore
+git add .gitignore
+git commit -m "update .gitignore"
+
+autoreconf -fiv
+git add configure
+git checkout INSTALL
+git commit -m "regenerate ./configure"
+
 %build
-%configure
+%configure --with-state-file-path=%{_localstatedir}/lib/logrotate/logrotate.status
 make %{?_smp_mflags}
 
 %check
@@ -47,7 +57,6 @@ mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/logrotate
 
 install -p -m 644 examples/logrotate-default $RPM_BUILD_ROOT/%{_sysconfdir}/logrotate.conf
 install -p -m 755 examples/logrotate.cron $RPM_BUILD_ROOT/%{_sysconfdir}/cron.daily/logrotate
-touch $RPM_BUILD_ROOT/%{_localstatedir}/lib/logrotate/logrotate.status
 
 # Make sure logrotate is able to run on read-only root
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/rwtab.d
@@ -78,6 +87,9 @@ fi
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Thu Nov 24 2016 Kamil Dudka <kdudka@redhat.com> - 3.10.0-4
+- make /var/lib/logrotate/logrotate.status the default state file (#1381719)
+
 * Fri Nov 11 2016 Kamil Dudka <kdudka@redhat.com> - 3.10.0-3
 - fix migration of state file from its previous location (#1393247)
 
