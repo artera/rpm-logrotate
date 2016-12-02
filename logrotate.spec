@@ -1,14 +1,11 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.10.0
-Release: 4%{?dist}
+Version: 3.11.0
+Release: 1%{?dist}
 License: GPL+
 Url: https://github.com/logrotate/logrotate
 Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
 Source1: rwtab
-
-# implement the --with-state-file-path option of configure (upstream patch)
-Patch0: logrotate-3.10.0-state-file-path.patch
 
 BuildRequires: acl
 BuildRequires: automake
@@ -38,8 +35,7 @@ git commit -m "update .gitignore"
 
 autoreconf -fiv
 git add configure
-git checkout INSTALL
-git commit -m "regenerate ./configure"
+git commit -m "force autoreconf" --allow-empty
 
 %build
 %configure --with-state-file-path=%{_localstatedir}/lib/logrotate/logrotate.status
@@ -75,7 +71,7 @@ fi
 %files
 %{!?_licensedir:%global license %%doc}
 %license COPYING
-%doc CHANGES
+%doc ChangeLog.md
 %{_sbindir}/logrotate
 %{_mandir}/man8/logrotate.8*
 %{_mandir}/man5/logrotate.conf.5*
@@ -87,6 +83,9 @@ fi
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Fri Dec 02 2016 Kamil Dudka <kdudka@redhat.com> - 3.11.0-1
+- new upstream version 3.11.0
+
 * Thu Nov 24 2016 Kamil Dudka <kdudka@redhat.com> - 3.10.0-4
 - make /var/lib/logrotate/logrotate.status the default state file (#1381719)
 
