@@ -29,7 +29,7 @@ log files on your system.
 %prep
 %autosetup -S git
 
-printf "/autom4te.cache\n" >> .gitignore
+printf "/autom4te.cache\n/build\n" >> .gitignore
 git add .gitignore
 git commit -m "update .gitignore"
 
@@ -38,14 +38,16 @@ git add configure
 git commit -m "force autoreconf" --allow-empty
 
 %build
-%configure --with-state-file-path=%{_localstatedir}/lib/logrotate/logrotate.status
+mkdir build && cd build && ln -s ../configure
+%configure srcdir=.. \
+    --with-state-file-path=%{_localstatedir}/lib/logrotate/logrotate.status
 make %{?_smp_mflags}
 
 %check
-make check
+make check -C build
 
 %install
-%make_install
+%make_install -C build
 
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/logrotate.d
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/cron.daily
@@ -84,6 +86,7 @@ fi
 
 %changelog
 * Fri Dec 02 2016 Kamil Dudka <kdudka@redhat.com> - 3.11.0-1
+- build out of source tree
 - new upstream version 3.11.0
 
 * Thu Nov 24 2016 Kamil Dudka <kdudka@redhat.com> - 3.10.0-4
