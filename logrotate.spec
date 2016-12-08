@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.11.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPL+
 Url: https://github.com/logrotate/logrotate
 Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
@@ -32,6 +32,14 @@ log files on your system.
 printf "/autom4te.cache\n/build\n" >> .gitignore
 git add .gitignore
 git commit -m "update .gitignore"
+
+%if 0%{?fedora} == 0 && 0%{?rhel} < 7
+sed -e 's/^AM_EXTRA_RECURSIVE_TARGETS/dnl AM_EXTRA_RECURSIVE_TARGETS/' \
+    -e 's/ serial-tests//' \
+    -i configure.ac
+git add configure.ac
+git commit -m "configure.ac: compatibility fixes for RHEL-6"
+%endif
 
 autoreconf -fiv
 git add configure
@@ -81,10 +89,13 @@ fi
 %config(noreplace) %{_sysconfdir}/logrotate.conf
 %dir %{_sysconfdir}/logrotate.d
 %dir %{_localstatedir}/lib/logrotate
-%ghost %verify(not size md5 mtime) %config(noreplace) %{_localstatedir}/lib/logrotate/logrotate.status
+%ghost %verify(not size md5 mtime) %attr(0644, root, root) %{_localstatedir}/lib/logrotate/logrotate.status
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Thu Dec 08 2016 Kamil Dudka <kdudka@redhat.com> - 3.11.0-2
+- make the package build on RHEL-6, too
+
 * Fri Dec 02 2016 Kamil Dudka <kdudka@redhat.com> - 3.11.0-1
 - build out of source tree
 - new upstream version 3.11.0
