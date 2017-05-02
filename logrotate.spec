@@ -1,6 +1,6 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.12.1
+Version: 3.12.2
 Release: 1%{?dist}
 License: GPL+
 Url: https://github.com/logrotate/logrotate
@@ -94,6 +94,9 @@ fi
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Tue May 02 2017 Kamil Dudka <kdudka@redhat.com> - 3.12.2-1
+- new upstream version 3.12.2
+
 * Fri Apr 21 2017 Kamil Dudka <kdudka@redhat.com> - 3.12.1-1
 - new upstream version 3.12.1
 
