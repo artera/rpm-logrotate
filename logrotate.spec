@@ -1,6 +1,6 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.12.2
+Version: 3.12.3
 Release: 1%{?dist}
 License: GPL+
 Url: https://github.com/logrotate/logrotate
@@ -29,7 +29,11 @@ log files on your system.
 %prep
 %autosetup -S git
 
-printf "/autom4te.cache\n/build\n" >> .gitignore
+cat >> .gitignore << EOF
+/autom4te.cache
+/build
+/config.h.in~
+EOF
 git add .gitignore
 git commit -m "update .gitignore"
 
@@ -42,7 +46,7 @@ git commit -m "configure.ac: compatibility fixes for RHEL-6"
 %endif
 
 autoreconf -fiv
-git add configure
+git add configure config.{guess,sub} Makefile.in
 git commit -m "force autoreconf" --allow-empty
 
 %build
@@ -94,6 +98,9 @@ fi
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Fri Jun 30 2017 Kamil Dudka <kdudka@redhat.com> - 3.12.3-1
+- new upstream version 3.12.3
+
 * Tue May 02 2017 Kamil Dudka <kdudka@redhat.com> - 3.12.2-1
 - new upstream version 3.12.2
 
