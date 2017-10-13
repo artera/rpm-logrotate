@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.12.3
-Release: 3%{?dist}
+Version: 3.13.0
+Release: 1%{?dist}
 License: GPL+
 Url: https://github.com/logrotate/logrotate
 Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
@@ -50,13 +50,13 @@ git add configure config.{guess,sub} Makefile.in
 git commit -m "force autoreconf" --allow-empty
 
 %build
-mkdir build && cd build && ln -s ../configure
-%configure srcdir=.. \
-    --with-state-file-path=%{_localstatedir}/lib/logrotate/logrotate.status
-make %{?_smp_mflags}
+mkdir build && cd build
+%global _configure ../configure
+%configure --with-state-file-path=%{_localstatedir}/lib/logrotate/logrotate.status
+make %{?_smp_mflags} V=1
 
 %check
-make check -C build
+make %{?_smp_mflags} -C build check
 
 %install
 %make_install -C build
@@ -98,6 +98,9 @@ fi
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Fri Oct 13 2017 Kamil Dudka <kdudka@redhat.com> - 3.13.0-1
+- new upstream version 3.13.0
+
 * Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.3-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
