@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.13.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL+
 Url: https://github.com/logrotate/logrotate
 Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
@@ -9,6 +9,7 @@ Source1: rwtab
 
 BuildRequires: acl
 BuildRequires: automake
+BuildRequires: gcc
 BuildRequires: git
 BuildRequires: libacl-devel
 BuildRequires: libselinux-devel
@@ -98,6 +99,9 @@ fi
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Mon Feb 19 2018 Kamil Dudka <kdudka@redhat.com> - 3.13.0-3
+- add explicit BR for the gcc compiler
+
 * Thu Feb 08 2018 Fedora Release Engineering <releng@fedoraproject.org> - 3.13.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
