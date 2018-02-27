@@ -62,15 +62,15 @@ make %{?_smp_mflags} -C build check
 %install
 %make_install -C build
 
-mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/logrotate.d
-mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/cron.daily
-mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/logrotate
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/cron.daily
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/logrotate
 
-install -p -m 644 examples/logrotate-default $RPM_BUILD_ROOT/%{_sysconfdir}/logrotate.conf
-install -p -m 755 examples/logrotate.cron $RPM_BUILD_ROOT/%{_sysconfdir}/cron.daily/logrotate
+install -p -m 644 examples/logrotate-default $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.conf
+install -p -m 755 examples/logrotate.cron $RPM_BUILD_ROOT%{_sysconfdir}/cron.daily/logrotate
 
 # Make sure logrotate is able to run on read-only root
-mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/rwtab.d
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/rwtab.d
 install -m644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/rwtab.d/logrotate
 
 %pre
