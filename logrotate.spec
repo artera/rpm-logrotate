@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.13.0
-Release: 3%{?dist}
+Version: 3.14.0
+Release: 1%{?dist}
 License: GPL+
 Url: https://github.com/logrotate/logrotate
 Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
@@ -67,6 +67,7 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/cron.daily
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/logrotate
 
 install -p -m 644 examples/logrotate-default $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.conf
+install -p -m 644 examples/{b,w}tmp $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/
 install -p -m 755 examples/logrotate.cron $RPM_BUILD_ROOT%{_sysconfdir}/cron.daily/logrotate
 
 # Make sure logrotate is able to run on read-only root
@@ -94,11 +95,15 @@ fi
 %config(noreplace) %{_sysconfdir}/cron.daily/logrotate
 %config(noreplace) %{_sysconfdir}/logrotate.conf
 %dir %{_sysconfdir}/logrotate.d
+%config(noreplace) %{_sysconfdir}/logrotate.d/{b,w}tmp
 %dir %{_localstatedir}/lib/logrotate
 %ghost %verify(not size md5 mtime) %attr(0644, root, root) %{_localstatedir}/lib/logrotate/logrotate.status
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Fri Mar 09 2018 Kamil Dudka <kdudka@redhat.com> - 3.14.0-1
+- new upstream version 3.14.0
+
 * Mon Feb 19 2018 Kamil Dudka <kdudka@redhat.com> - 3.13.0-3
 - add explicit BR for the gcc compiler
 
