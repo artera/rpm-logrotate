@@ -47,7 +47,7 @@ git commit -m "configure.ac: compatibility fixes for RHEL-6"
 %endif
 
 autoreconf -fiv
-git add configure config.{guess,sub} Makefile.in
+git add configure config.{guess,sub} Makefile.in install-sh
 git commit -m "force autoreconf" --allow-empty
 
 %build
