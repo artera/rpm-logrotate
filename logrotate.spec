@@ -1,8 +1,8 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.14.0
-Release: 1%{?dist}
-License: GPL+
+Release: 2%{?dist}
+License: GPLv2+
 Url: https://github.com/logrotate/logrotate
 Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
 Source1: rwtab
@@ -101,6 +101,9 @@ fi
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Wed Jul 11 2018 Kamil Dudka <kdudka@redhat.com> - 3.14.0-2
+- fix license tag to match the source code license
+
 * Fri Mar 09 2018 Kamil Dudka <kdudka@redhat.com> - 3.14.0-1
 - new upstream version 3.14.0
 
