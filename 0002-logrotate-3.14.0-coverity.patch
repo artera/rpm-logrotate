@@ -1,0 +1,630 @@
+From a4ac21e9a8cfe8a73471a195308a742e07d7fe8d Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Wed, 1 Aug 2018 15:32:38 +0200
+Subject: [PATCH 1/3] readConfigFile: assign and check 'key' separately
+
+... to make the code readable.  No changes in behavior intended
+by this commit.
+---
+ config.c | 312 +++++++++++++++++++++++++++----------------------------
+ 1 file changed, 152 insertions(+), 160 deletions(-)
+
+diff --git a/config.c b/config.c
+index 84db36f..d2fba10 100644
+--- a/config.c
++++ b/config.c
+@@ -1037,7 +1037,8 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 			}
+ 
+ 			if (isalpha((unsigned char)*start)) {
+-				if ((key = isolateWord(&start, &buf, length)) == NULL)
++				key = isolateWord(&start, &buf, length);
++				if (key == NULL)
+ 					continue;
+ 				if (!strcmp(key, "compress")) {
+ 					newlog->flags |= LOG_FLAG_COMPRESS;
+@@ -1191,16 +1192,16 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 					}
+ 				} else if (!strcmp(key, "shredcycles")) {
+ 					free(key);
+-					if ((key = isolateValue(configFile, lineNum, "shred cycles",
+-							&start, &buf, length)) != NULL) {
+-						newlog->shred_cycles = strtoul(key, &chptr, 0);
+-						if (*chptr || newlog->shred_cycles < 0) {
+-							message(MESS_ERROR, "%s:%d bad shred cycles '%s'\n",
+-									configFile, lineNum, key);
+-							goto error;
+-						}
++					key = isolateValue(configFile, lineNum, "shred cycles",
++							&start, &buf, length);
++					if (key == NULL)
++						continue;
++					newlog->shred_cycles = strtoul(key, &chptr, 0);
++					if (*chptr || newlog->shred_cycles < 0) {
++						message(MESS_ERROR, "%s:%d bad shred cycles '%s'\n",
++								configFile, lineNum, key);
++						goto error;
+ 					}
+-					else continue;
+ 				} else if (!strcmp(key, "hourly")) {
+ 					newlog->criterium = ROT_HOURLY;
+ 				} else if (!strcmp(key, "daily")) {
+@@ -1232,59 +1233,53 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 					newlog->criterium = ROT_YEARLY;
+ 				} else if (!strcmp(key, "rotate")) {
+ 					free(key);
+-					if ((key = isolateValue
+-						(configFile, lineNum, "rotate count", &start,
+-						&buf, length)) != NULL) {
+-
+-						newlog->rotateCount = strtoul(key, &chptr, 0);
+-						if (*chptr || newlog->rotateCount < 0) {
+-							message(MESS_ERROR,
+-								"%s:%d bad rotation count '%s'\n",
+-								configFile, lineNum, key);
+-							RAISE_ERROR();
+-						}
++					key = isolateValue(configFile, lineNum, "rotate count", &start,
++						&buf, length);
++					if (key == NULL)
++						continue;
++					newlog->rotateCount = strtoul(key, &chptr, 0);
++					if (*chptr || newlog->rotateCount < 0) {
++						message(MESS_ERROR,
++							"%s:%d bad rotation count '%s'\n",
++							configFile, lineNum, key);
++						RAISE_ERROR();
+ 					}
+-					else continue;
+ 				} else if (!strcmp(key, "start")) {
+ 					free(key);
+-					if ((key = isolateValue
+-						(configFile, lineNum, "start count", &start,
+-						&buf, length)) != NULL) {
+-
+-						newlog->logStart = strtoul(key, &chptr, 0);
+-						if (*chptr || newlog->logStart < 0) {
+-							message(MESS_ERROR, "%s:%d bad start count '%s'\n",
+-								configFile, lineNum, key);
+-							RAISE_ERROR();
+-						}
++					key = isolateValue(configFile, lineNum, "start count", &start,
++						&buf, length);
++					if (key == NULL)
++						continue;
++					newlog->logStart = strtoul(key, &chptr, 0);
++					if (*chptr || newlog->logStart < 0) {
++						message(MESS_ERROR, "%s:%d bad start count '%s'\n",
++							configFile, lineNum, key);
++						RAISE_ERROR();
+ 					}
+-					else continue;
+ 				} else if (!strcmp(key, "minage")) {
+ 					free(key);
+-					if ((key = isolateValue
+-						(configFile, lineNum, "minage count", &start,
+-						&buf, length)) != NULL) {
+-						newlog->rotateMinAge = strtoul(key, &chptr, 0);
+-						if (*chptr || newlog->rotateMinAge < 0) {
+-							message(MESS_ERROR, "%s:%d bad minimum age '%s'\n",
+-								configFile, lineNum, start);
+-							RAISE_ERROR();
+-						}
++					key = isolateValue(configFile, lineNum, "minage count", &start,
++						&buf, length);
++					if (key == NULL)
++						continue;
++					newlog->rotateMinAge = strtoul(key, &chptr, 0);
++					if (*chptr || newlog->rotateMinAge < 0) {
++						message(MESS_ERROR, "%s:%d bad minimum age '%s'\n",
++							configFile, lineNum, start);
++						RAISE_ERROR();
+ 					}
+-					else continue;
+ 				} else if (!strcmp(key, "maxage")) {
+ 					free(key);
+-					if ((key = isolateValue
+-						(configFile, lineNum, "maxage count", &start,
+-						&buf, length)) != NULL) {
+-						newlog->rotateAge = strtoul(key, &chptr, 0);
+-						if (*chptr || newlog->rotateAge < 0) {
+-							message(MESS_ERROR, "%s:%d bad maximum age '%s'\n",
+-								configFile, lineNum, start);
+-							RAISE_ERROR();
+-						}
++					key = isolateValue(configFile, lineNum, "maxage count", &start,
++						&buf, length);
++					if (key == NULL)
++						continue;
++					newlog->rotateAge = strtoul(key, &chptr, 0);
++					if (*chptr || newlog->rotateAge < 0) {
++						message(MESS_ERROR, "%s:%d bad maximum age '%s'\n",
++							configFile, lineNum, start);
++						RAISE_ERROR();
+ 					}
+-					else continue;
+ 				} else if (!strcmp(key, "errors")) {
+ 					message(MESS_DEBUG,
+ 						"%s: %d: the errors directive is deprecated and no longer used.\n",
+@@ -1337,48 +1332,48 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 						continue;
+ 					}
+ 					free(key);
+-					if ((key = isolateValue(configFile, lineNum, "tabooext", &start,
+-							&buf, length)) != NULL) {
+-						endtag = key;
+-						if (*endtag == '+') {
++					key = isolateValue(configFile, lineNum, "tabooext", &start,
++							&buf, length);
++					if (key == NULL)
++						continue;
++					endtag = key;
++					if (*endtag == '+') {
++						endtag++;
++						while (isspace((unsigned char)*endtag) && *endtag)
+ 							endtag++;
+-							while (isspace((unsigned char)*endtag) && *endtag)
+-								endtag++;
+-						} else {
+-							free_2d_array(tabooPatterns, tabooCount);
+-							tabooCount = 0;
+-							/* realloc of NULL is safe by definition */
+-							tabooPatterns = NULL;
+-						}
+-
+-						while (*endtag) {
+-							int bytes;
+-							char *pattern = NULL;
++					} else {
++						free_2d_array(tabooPatterns, tabooCount);
++						tabooCount = 0;
++						/* realloc of NULL is safe by definition */
++						tabooPatterns = NULL;
++					}
+ 
+-							chptr = endtag;
+-							while (!isspace((unsigned char)*chptr) && *chptr != ',' && *chptr)
+-								chptr++;
++					while (*endtag) {
++						int bytes;
++						char *pattern = NULL;
+ 
+-							/* accept only non-empty patterns to avoid exclusion of everything */
+-							if (endtag < chptr) {
+-								tabooPatterns = realloc(tabooPatterns, sizeof(*tabooPatterns) *
+-											(tabooCount + 1));
+-								bytes = asprintf(&pattern, "*%.*s", (int)(chptr - endtag), endtag);
++						chptr = endtag;
++						while (!isspace((unsigned char)*chptr) && *chptr != ',' && *chptr)
++							chptr++;
+ 
+-								/* should test for malloc() failure */
+-								assert(bytes != -1);
+-								tabooPatterns[tabooCount] = pattern;
+-								tabooCount++;
+-							}
++						/* accept only non-empty patterns to avoid exclusion of everything */
++						if (endtag < chptr) {
++							tabooPatterns = realloc(tabooPatterns, sizeof(*tabooPatterns) *
++										(tabooCount + 1));
++							bytes = asprintf(&pattern, "*%.*s", (int)(chptr - endtag), endtag);
+ 
+-							endtag = chptr;
+-							if (*endtag == ',')
+-								endtag++;
+-							while (*endtag && isspace((unsigned char)*endtag))
+-								endtag++;
++							/* should test for malloc() failure */
++							assert(bytes != -1);
++							tabooPatterns[tabooCount] = pattern;
++							tabooCount++;
+ 						}
++
++						endtag = chptr;
++						if (*endtag == ',')
++							endtag++;
++						while (*endtag && isspace((unsigned char)*endtag))
++							endtag++;
+ 					}
+-					else continue;
+ 				} else if (!strcmp(key, "taboopat")) {
+ 					if (newlog != defConfig) {
+ 						message(MESS_ERROR,
+@@ -1389,68 +1384,68 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 						continue;
+ 					}
+ 					free(key);
+-					if ((key = isolateValue(configFile, lineNum, "taboopat", &start,
+-							&buf, length)) != NULL) {
+-						endtag = key;
+-						if (*endtag == '+') {
++					key = isolateValue(configFile, lineNum, "taboopat", &start,
++							&buf, length);
++					if (key == NULL)
++						continue;
++
++					endtag = key;
++					if (*endtag == '+') {
++						endtag++;
++						while (isspace((unsigned char)*endtag) && *endtag)
+ 							endtag++;
+-							while (isspace((unsigned char)*endtag) && *endtag)
+-								endtag++;
+-						} else {
+-							free_2d_array(tabooPatterns, tabooCount);
+-							tabooCount = 0;
+-							/* realloc of NULL is safe by definition */
+-							tabooPatterns = NULL;
+-						}
++					} else {
++						free_2d_array(tabooPatterns, tabooCount);
++						tabooCount = 0;
++						/* realloc of NULL is safe by definition */
++						tabooPatterns = NULL;
++					}
+ 
+-						while (*endtag) {
+-							int bytes;
+-							char *pattern = NULL;
++					while (*endtag) {
++						int bytes;
++						char *pattern = NULL;
+ 
+-							chptr = endtag;
+-							while (!isspace((unsigned char)*chptr) && *chptr != ',' && *chptr)
+-								chptr++;
++						chptr = endtag;
++						while (!isspace((unsigned char)*chptr) && *chptr != ',' && *chptr)
++							chptr++;
+ 
+-							tabooPatterns = realloc(tabooPatterns, sizeof(*tabooPatterns) *
+-										(tabooCount + 1));
+-							bytes = asprintf(&pattern, "%.*s", (int)(chptr - endtag), endtag);
++						tabooPatterns = realloc(tabooPatterns, sizeof(*tabooPatterns) *
++									(tabooCount + 1));
++						bytes = asprintf(&pattern, "%.*s", (int)(chptr - endtag), endtag);
+ 
+-							/* should test for malloc() failure */
+-							assert(bytes != -1);
+-							tabooPatterns[tabooCount] = pattern;
+-							tabooCount++;
++						/* should test for malloc() failure */
++						assert(bytes != -1);
++						tabooPatterns[tabooCount] = pattern;
++						tabooCount++;
+ 
+-							endtag = chptr;
+-							if (*endtag == ',')
+-								endtag++;
+-							while (*endtag && isspace((unsigned char)*endtag))
+-								endtag++;
+-						}
++						endtag = chptr;
++						if (*endtag == ',')
++							endtag++;
++						while (*endtag && isspace((unsigned char)*endtag))
++							endtag++;
+ 					}
+-					else continue;
+ 				} else if (!strcmp(key, "include")) {
+ 					free(key);
+-					if ((key = isolateValue(configFile, lineNum, "include", &start,
+-							&buf, length)) != NULL) {
+-
+-						message(MESS_DEBUG, "including %s\n", key);
+-						if (recursion_depth >= MAX_NESTING) {
+-							message(MESS_ERROR, "%s:%d include nesting too deep\n",
+-									configFile, lineNum);
+-							logerror = 1;
+-							continue;
+-						}
++					key = isolateValue(configFile, lineNum, "include", &start,
++							&buf, length);
++					if (key == NULL)
++						continue;
++					message(MESS_DEBUG, "including %s\n", key);
++					if (recursion_depth >= MAX_NESTING) {
++						message(MESS_ERROR, "%s:%d include nesting too deep\n",
++								configFile, lineNum);
++						logerror = 1;
++						continue;
++					}
+ 
+-						++recursion_depth;
+-						rv = readConfigPath(key, newlog);
+-						--recursion_depth;
++					++recursion_depth;
++					rv = readConfigPath(key, newlog);
++					--recursion_depth;
+ 
+-						if (rv) {
+-							logerror = 1;
+-							continue;
+-						}
++					if (rv) {
++						logerror = 1;
++						continue;
+ 					}
+-					else continue;
+ 				} else if (!strcmp(key, "olddir")) {
+ 					freeLogItem (oldDir);
+ 
+@@ -1460,28 +1455,23 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 					}
+ 					message(MESS_DEBUG, "olddir is now %s\n", newlog->oldDir);
+ 				} else if (!strcmp(key, "extension")) {
+-					if ((key = isolateValue
+-						(configFile, lineNum, "extension name", &start,
+-							&buf, length)) != NULL) {
+-						freeLogItem (extension);
+-						newlog->extension = key;
+-						key = NULL;
+-					}
+-					else continue;
+-
+-					message(MESS_DEBUG, "extension is now %s\n",
+-						newlog->extension);
++					key = isolateValue(configFile, lineNum, "extension name", &start,
++							&buf, length);
++					if (key == NULL)
++						continue;
++					freeLogItem (extension);
++					newlog->extension = key;
++					key = NULL;
++					message(MESS_DEBUG, "extension is now %s\n", newlog->extension);
+ 
+ 				} else if (!strcmp(key, "addextension")) {
+-					if ((key = isolateValue
+-						(configFile, lineNum, "addextension name", &start,
+-							&buf, length)) != NULL) {
+-						freeLogItem (addextension);
+-						newlog->addextension = key;
+-						key = NULL;
+-					}
+-					else continue;
+-
++					key = isolateValue(configFile, lineNum, "addextension name", &start,
++							&buf, length);
++					if (key == NULL)
++						continue;
++					freeLogItem (addextension);
++					newlog->addextension = key;
++					key = NULL;
+ 					message(MESS_DEBUG, "addextension is now %s\n",
+ 						newlog->addextension);
+ 
+@@ -1827,7 +1817,8 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 			break;
+ 		case STATE_LOAD_SCRIPT:
+ 		case STATE_LOAD_SCRIPT | STATE_SKIP_CONFIG:
+-			if ((key = isolateWord(&start, &buf, length)) == NULL)
++			key = isolateWord(&start, &buf, length);
++			if (key == NULL)
+ 				continue;
+ 
+ 			if (strcmp(key, "endscript") == 0) {
+@@ -1862,7 +1853,8 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 				newlog = defConfig;
+ 			}
+ 			else {
+-				if ((key = isolateWord(&start, &buf, length)) == NULL)
++				key = isolateWord(&start, &buf, length);
++				if (key == NULL)
+ 					continue;
+ 				if (
+ 					(strcmp(key, "postrotate") == 0) ||
+-- 
+2.17.1
+
+
+From a3a955494999bd4861f14b846c345cbc96715262 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Wed, 1 Aug 2018 15:09:40 +0200
+Subject: [PATCH 2/3] readConfigFile: assign and free 'key' consistently
+
+This commit fixes the following memory leaks (detected by Coverity):
+
+Error: RESOURCE_LEAK:
+config.c:1466: overwrite_var: Overwriting "key" in "key = isolateValue(configFile, lineNum, "extension name", &start, &buf, length)" leaks the storage that "key" points to.
+
+Error: RESOURCE_LEAK:
+config.c:1479: overwrite_var: Overwriting "key" in "key = isolateValue(configFile, lineNum, "addextension name", &start, &buf, length)" leaks the storage that "key" points to.
+
+Error: RESOURCE_LEAK:
+config.c:1043: alloc_fn: Storage is returned from allocation function "isolateWord".
+config.c:219:2: alloc_fn: Storage is returned from allocation function "strndup".
+config.c:219:2: assign: Assigning: "key" = "strndup(start, endtag - start)".
+config.c:221:2: return_alloc: Returning allocated memory "key".
+config.c:1043: var_assign: Assigning: "key" = storage returned from "isolateWord(&start, &buf, length)".
+config.c:1928: leaked_storage: Variable "key" going out of scope leaks the storage it points to.
+
+Error: RESOURCE_LEAK:
+config.c:1153: alloc_fn: Storage is returned from allocation function "isolateValue".
+config.c:204:2: alloc_fn: Storage is returned from allocation function "isolateLine".
+config.c:178:2: alloc_fn: Storage is returned from allocation function "strndup".
+config.c:178:2: assign: Assigning: "key" = "strndup(start, endtag - start + 1L)".
+config.c:180:2: return_alloc: Returning allocated memory "key".
+config.c:204:2: return_alloc_fn: Directly returning storage allocated by "isolateLine".
+config.c:1153: var_assign: Assigning: "key" = storage returned from "isolateValue(configFile, lineNum, opt, &start, &buf, length)".
+config.c:1928: leaked_storage: Variable "key" going out of scope leaks the storage it points to.
+
+Error: RESOURCE_LEAK:
+config.c:1219: alloc_fn: Storage is returned from allocation function "isolateLine".
+config.c:178:2: alloc_fn: Storage is returned from allocation function "strndup".
+config.c:178:2: assign: Assigning: "key" = "strndup(start, endtag - start + 1L)".
+config.c:180:2: return_alloc: Returning allocated memory "key".
+config.c:1219: var_assign: Assigning: "key" = storage returned from "isolateLine(&start, &buf, length)".
+config.c:1928: leaked_storage: Variable "key" going out of scope leaks the storage it points to.
+
+Closes #208
+---
+ config.c | 19 +++++++------------
+ 1 file changed, 7 insertions(+), 12 deletions(-)
+
+diff --git a/config.c b/config.c
+index d2fba10..39c9bc7 100644
+--- a/config.c
++++ b/config.c
+@@ -1022,10 +1022,6 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 
+ 	start = buf;
+     for (start = buf; start - buf < length; start++) {
+-	if (key) {
+-		free(key);
+-		key = NULL;
+-	}
+ 	switch (state) {
+ 		case STATE_DEFAULT:
+ 			if (isblank((unsigned char)*start))
+@@ -1037,6 +1033,7 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 			}
+ 
+ 			if (isalpha((unsigned char)*start)) {
++				free(key);
+ 				key = isolateWord(&start, &buf, length);
+ 				if (key == NULL)
+ 					continue;
+@@ -1455,6 +1452,7 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 					}
+ 					message(MESS_DEBUG, "olddir is now %s\n", newlog->oldDir);
+ 				} else if (!strcmp(key, "extension")) {
++					free(key);
+ 					key = isolateValue(configFile, lineNum, "extension name", &start,
+ 							&buf, length);
+ 					if (key == NULL)
+@@ -1465,6 +1463,7 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 					message(MESS_DEBUG, "extension is now %s\n", newlog->extension);
+ 
+ 				} else if (!strcmp(key, "addextension")) {
++					free(key);
+ 					key = isolateValue(configFile, lineNum, "addextension name", &start,
+ 							&buf, length);
+ 					if (key == NULL)
+@@ -1557,8 +1556,6 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 					if (*start != '\n')
+ 						state = STATE_SKIP_LINE;
+ 				}
+-				free(key);
+-				key = NULL;
+ 			} else if (*start == '/' || *start == '"' || *start == '\''
+ #ifdef GLOB_TILDE
+                                                                            || *start == '~'
+@@ -1817,6 +1814,7 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 			break;
+ 		case STATE_LOAD_SCRIPT:
+ 		case STATE_LOAD_SCRIPT | STATE_SKIP_CONFIG:
++			free(key);
+ 			key = isolateWord(&start, &buf, length);
+ 			if (key == NULL)
+ 				continue;
+@@ -1853,6 +1851,7 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 				newlog = defConfig;
+ 			}
+ 			else {
++				free(key);
+ 				key = isolateWord(&start, &buf, length);
+ 				if (key == NULL)
+ 					continue;
+@@ -1884,8 +1883,6 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 						state = STATE_SKIP_LINE | STATE_SKIP_CONFIG;
+ 					}
+ 				}
+-				free(key);
+-				key = NULL;
+ 			}
+ 			break;
+ 		default:
+@@ -1893,10 +1890,6 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 				"%s: %d: readConfigFile() unknown state\n",
+ 				configFile, lineNum);
+ 	}
+-	if (key) {
+-		free(key);
+-		key = NULL;
+-	}
+ 	if (*start == '\n') {
+ 	    lineNum++;
+ 	}
+@@ -1910,6 +1903,8 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+ 	goto error;
+     }
+ 
++    free(key);
++
+ 	munmap(buf, (size_t) length);
+ 	close(fd);
+     return logerror;
+-- 
+2.17.1
+
+
+From 771af94fd6c6299a7cb3d20c8b247591775653d3 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Wed, 1 Aug 2018 16:06:27 +0200
+Subject: [PATCH 3/3] simplify code of prerotateSingleLog()
+
+... to eliminate a use-after-free false positive reported by Coverity:
+
+Error: USE_AFTER_FREE:
+logrotate.c:1800: freed_arg: "free" frees "oldName".
+logrotate.c:1779: use_after_free: Using freed pointer "oldName".
+
+Closes #209
+---
+ logrotate.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/logrotate.c b/logrotate.c
+index 02d45e9..95fd70b 100644
+--- a/logrotate.c
++++ b/logrotate.c
+@@ -1353,7 +1353,7 @@ static int prerotateSingleLog(struct logInfo *log, int logNum,
+ 			      struct logState *state, struct logNames *rotNames)
+ {
+     struct tm now = *localtime(&nowSecs);
+-    char *oldName, *newName = NULL;
++    char *oldName = NULL;
+     const char *compext = "";
+     const char *fileext = "";
+     int hasErrors = 0;
+@@ -1670,6 +1670,7 @@ static int prerotateSingleLog(struct logInfo *log, int logNum,
+ 	free(glob_pattern);
+     } else {
+ 	int i;
++	char *newName = NULL;
+ 	if (log->rotateAge) {
+ 	    struct stat fst_buf;
+ 	    for (i = 1; i <= rotateCount + 1; i++) {
+@@ -1697,7 +1698,6 @@ static int prerotateSingleLog(struct logInfo *log, int logNum,
+ 		compext) < 0) {
+ 	    message(MESS_FATAL, "could not allocate disposeName memory\n");
+ 	}
+-	newName = strdup(oldName);
+ 
+ 	rotNames->disposeName = strdup(oldName);
+ 
+@@ -1711,6 +1711,8 @@ static int prerotateSingleLog(struct logInfo *log, int logNum,
+ 		if (asprintf(&oldName, "%s/%s.%d%s%s", rotNames->dirName,
+ 		    rotNames->baseName, i, fileext, compext) < 0) {
+ 		    message(MESS_FATAL, "could not allocate oldName memory\n");
++		    oldName = NULL;
++		    break;
+ 		}
+ 
+ 	    message(MESS_DEBUG,
+@@ -1727,11 +1729,9 @@ static int prerotateSingleLog(struct logInfo *log, int logNum,
+ 		    hasErrors = 1;
+ 		}
+ 	    }
+-	    if (hasErrors || i - 1 < 0)
+-		    free(oldName);
+-
+ 	}
+ 	free(newName);
++	free(oldName);
+     }				/* !LOG_FLAG_DATEEXT */
+ 
+ 	if (log->flags & LOG_FLAG_DATEEXT) {
+-- 
+2.17.1
+

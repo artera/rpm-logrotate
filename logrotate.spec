@@ -19,6 +19,9 @@ Requires: coreutils
 # document the --version option in the logrotate(8) man page (#1611498)
 Patch1:   0001-logrotate-3.14.0-man-version.patch
 
+# fix programming mistakes detected by Coverity Analysis
+Patch2:   0002-logrotate-3.14.0-coverity.patch
+
 %description
 The logrotate utility is designed to simplify the administration of
 log files on a system which generates a lot of log files.  Logrotate
@@ -105,6 +108,7 @@ fi
 
 %changelog
 * Fri Aug 10 2018 Kamil Dudka <kdudka@redhat.com> - 3.14.0-4
+- fix programming mistakes detected by Coverity Analysis
 - document the --version option in the logrotate(8) man page (#1611498)
 
 * Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 3.14.0-3
