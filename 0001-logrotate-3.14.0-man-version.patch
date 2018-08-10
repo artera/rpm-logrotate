@@ -1,0 +1,34 @@
+From b0d067cfba64956893fc095bb37f8c767f5a910e Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Mon, 6 Aug 2018 17:13:31 +0200
+Subject: [PATCH] logrotate.8: document the --version option
+
+The man page now covers all the options that are listed
+by `logrotate --help`.
+
+Bug: https://bugzilla.redhat.com/1611498
+
+Upstream-commit: 4088ef987df2ec48cc3d968eb87ad27c840fa2d8
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ logrotate.8.in | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/logrotate.8.in b/logrotate.8.in
+index 004229e..5ef09c5 100644
+--- a/logrotate.8.in
++++ b/logrotate.8.in
+@@ -87,6 +87,10 @@ Prints a short usage message.
+ \fB\-v\fR, \fB\-\-verbose\fR
+ Turns on verbose mode, for example to display messages during rotation.
+ 
++.TP
++\fB\-\-version\fR
++Display version information.
++
+ .SH CONFIGURATION FILE
+ 
+ \fBlogrotate\fR reads everything about the log files it should be handling
+-- 
+2.17.1
+

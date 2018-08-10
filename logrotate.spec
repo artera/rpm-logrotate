@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.14.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2+
 Url: https://github.com/logrotate/logrotate
 Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
@@ -15,6 +15,9 @@ BuildRequires: libacl-devel
 BuildRequires: libselinux-devel
 BuildRequires: popt-devel
 Requires: coreutils
+
+# document the --version option in the logrotate(8) man page (#1611498)
+Patch1:   0001-logrotate-3.14.0-man-version.patch
 
 %description
 The logrotate utility is designed to simplify the administration of
@@ -47,7 +50,7 @@ git commit -m "configure.ac: compatibility fixes for RHEL-6"
 %endif
 
 autoreconf -fiv
-git add configure config.{guess,sub} Makefile.in install-sh
+git add --all
 git commit -m "force autoreconf" --allow-empty
 
 %build
@@ -101,6 +104,9 @@ fi
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Fri Aug 10 2018 Kamil Dudka <kdudka@redhat.com> - 3.14.0-4
+- document the --version option in the logrotate(8) man page (#1611498)
+
 * Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 3.14.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
