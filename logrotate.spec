@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.14.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2+
 Url: https://github.com/logrotate/logrotate
 Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
@@ -13,6 +13,7 @@ BuildRequires: gcc
 BuildRequires: git
 BuildRequires: libacl-devel
 BuildRequires: libselinux-devel
+BuildRequires: make
 BuildRequires: popt-devel
 Requires: coreutils
 
@@ -107,6 +108,9 @@ fi
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Wed Nov 21 2018 Alejandro Domínguez Muñoz <adomu@net-c.com> - 3.14.0-5
+- add make as a build dependency
+
 * Fri Aug 10 2018 Kamil Dudka <kdudka@redhat.com> - 3.14.0-4
 - fix programming mistakes detected by Coverity Analysis
 - document the --version option in the logrotate(8) man page (#1611498)
