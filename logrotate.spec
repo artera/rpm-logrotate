@@ -15,7 +15,10 @@ BuildRequires: libacl-devel
 BuildRequires: libselinux-devel
 BuildRequires: make
 BuildRequires: popt-devel
+BuildRequires: systemd-rpm-macros
 Requires: coreutils
+Requires(post): systemd
+Requires(preun): systemd
 
 # document the --version option in the logrotate(8) man page (#1611498)
 Patch1:   0001-logrotate-3.14.0-man-version.patch
@@ -28,8 +31,7 @@ The logrotate utility is designed to simplify the administration of
 log files on a system which generates a lot of log files.  Logrotate
 allows for the automatic rotation compression, removal and mailing of
 log files.  Logrotate can be set to handle a log file daily, weekly,
-monthly or when the log file gets to a certain size.  Normally,
-logrotate runs as a daily cron job.
+monthly or when the log file gets to a certain size.
 
 Install the logrotate package if you need a utility to deal with the
 log files on your system.
@@ -70,12 +72,12 @@ make %{?_smp_mflags} -C build check
 %make_install -C build
 
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/cron.daily
+mkdir -p $RPM_BUILD_ROOT%{_unitdir}
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/logrotate
 
 install -p -m 644 examples/logrotate-default $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.conf
 install -p -m 644 examples/{b,w}tmp $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/
-install -p -m 755 examples/logrotate.cron $RPM_BUILD_ROOT%{_sysconfdir}/cron.daily/logrotate
+install -p -m 644 examples/logrotate.{service,timer} $RPM_BUILD_ROOT%{_unitdir}/
 
 # Make sure logrotate is able to run on read-only root
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/rwtab.d
@@ -91,15 +93,27 @@ if [ ! -d %{_localstatedir}/lib/logrotate/ -a -f %{_localstatedir}/lib/logrotate
   cp -a %{_localstatedir}/lib/logrotate.status %{_localstatedir}/lib/logrotate
 fi
 
+%post
+%systemd_post logrotate.{service,timer}
+
+# If there is any cron daemon configured, enable the systemd timer to avoid
+# breaking the configuration silently when upgrading from 3.14.0-4 or
+# earlier versions
+%triggerin -- logrotate < 3.14.0-5
+[ -e %{_sysconfdir}/crontab -o -e %{_sysconfdir}/anacrontab -o -e %{_sysconfdir}/fcrontab ] \
+  && %{_bindir}/systemctl enable --now logrotate.timer &>/dev/null || :
+
+%preun
+%systemd_preun logrotate.{service,timer}
+
 %files
 %{!?_licensedir:%global license %%doc}
 %license COPYING
 %doc ChangeLog.md
 %{_sbindir}/logrotate
+%{_unitdir}/logrotate.{service,timer}
 %{_mandir}/man8/logrotate.8*
 %{_mandir}/man5/logrotate.conf.5*
-%dir %{_sysconfdir}/cron.daily
-%config(noreplace) %{_sysconfdir}/cron.daily/logrotate
 %config(noreplace) %{_sysconfdir}/logrotate.conf
 %dir %{_sysconfdir}/logrotate.d
 %config(noreplace) %{_sysconfdir}/logrotate.d/{b,w}tmp
@@ -110,6 +124,7 @@ fi
 %changelog
 * Wed Nov 21 2018 Alejandro Domínguez Muñoz <adomu@net-c.com> - 3.14.0-5
 - add make as a build dependency
+- replace cron job with a systemd timer unit (#1502085, #1655153)
 
 * Fri Aug 10 2018 Kamil Dudka <kdudka@redhat.com> - 3.14.0-4
 - fix programming mistakes detected by Coverity Analysis
