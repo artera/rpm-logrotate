@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.14.0
-Release: 5%{?dist}
+Version: 3.15.0
+Release: 1%{?dist}
 License: GPLv2+
 Url: https://github.com/logrotate/logrotate
 Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
@@ -19,12 +19,6 @@ BuildRequires: systemd-rpm-macros
 Requires: coreutils
 Requires(post): systemd
 Requires(preun): systemd
-
-# document the --version option in the logrotate(8) man page (#1611498)
-Patch1:   0001-logrotate-3.14.0-man-version.patch
-
-# fix programming mistakes detected by Coverity Analysis
-Patch2:   0002-logrotate-3.14.0-coverity.patch
 
 %description
 The logrotate utility is designed to simplify the administration of
@@ -75,7 +69,7 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/logrotate
 
-install -p -m 644 examples/logrotate-default $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.conf
+install -p -m 644 examples/logrotate.conf $RPM_BUILD_ROOT%{_sysconfdir}/
 install -p -m 644 examples/{b,w}tmp $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/
 install -p -m 644 examples/logrotate.{service,timer} $RPM_BUILD_ROOT%{_unitdir}/
 
@@ -122,6 +116,9 @@ fi
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Tue Dec 04 2018 Kamil Dudka <kdudka@redhat.com> - 3.15.0-1
+- new upstream version 3.15.0
+
 * Wed Nov 21 2018 Alejandro Domínguez Muñoz <adomu@net-c.com> - 3.14.0-5
 - add make as a build dependency
 - replace cron job with a systemd timer unit (#1502085, #1655153)
