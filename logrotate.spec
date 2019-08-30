@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
-Version: 3.15.0
-Release: 3%{?dist}
+Version: 3.15.1
+Release: 1%{?dist}
 License: GPLv2+
 Url: https://github.com/logrotate/logrotate
 Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
@@ -116,6 +116,9 @@ fi
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Fri Aug 30 2019 Kamil Dudka <kdudka@redhat.com> - 3.15.1-1
+- new upstream version 3.15.1
+
 * Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.15.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
