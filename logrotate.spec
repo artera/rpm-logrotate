@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.15.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2+
 Url: https://github.com/logrotate/logrotate
 Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
@@ -19,6 +19,9 @@ BuildRequires: systemd-rpm-macros
 Requires: coreutils
 Requires(post): systemd
 Requires(preun): systemd
+
+# make the code compile with gcc-10
+Patch1: 0001-logrotate-3.15.1-gcc-10-build-fix.patch
 
 %description
 The logrotate utility is designed to simplify the administration of
@@ -116,6 +119,9 @@ fi
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Thu Jan 30 2020 Kamil Dudka <kdudka@redhat.com> - 3.15.1-3
+- make the code compile with gcc-10
+
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.15.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
