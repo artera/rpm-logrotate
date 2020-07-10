@@ -41,14 +41,6 @@ EOF
 git add .gitignore
 git commit -m "update .gitignore"
 
-%if 0%{?fedora} == 0 && 0%{?rhel} < 7
-sed -e 's/^AM_EXTRA_RECURSIVE_TARGETS/dnl AM_EXTRA_RECURSIVE_TARGETS/' \
-    -e 's/ serial-tests//' \
-    -i configure.ac
-git add configure.ac
-git commit -m "configure.ac: compatibility fixes for RHEL-6"
-%endif
-
 autoreconf -fiv
 git add --all
 git commit -m "force autoreconf" --allow-empty
