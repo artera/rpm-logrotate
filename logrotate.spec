@@ -52,7 +52,7 @@ mkdir build && cd build
 %make_build
 
 %check
-%make_build -C build check
+%make_build -C build -s check
 
 %install
 %make_install -C build
