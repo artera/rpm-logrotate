@@ -3,8 +3,8 @@ Name: logrotate
 Version: 3.18.0
 Release: 1%{?dist}
 License: GPLv2+
-Url: https://github.com/logrotate/logrotate
-Source: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
+URL: https://github.com/logrotate/logrotate
+Source0: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
 Source1: rwtab
 
 BuildRequires: acl
@@ -93,7 +93,6 @@ fi
 %systemd_preun logrotate.{service,timer}
 
 %files
-%{!?_licensedir:%global license %%doc}
 %license COPYING
 %doc ChangeLog.md
 %{_sbindir}/logrotate
