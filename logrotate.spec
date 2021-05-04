@@ -1,11 +1,14 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.18.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2+
 URL: https://github.com/logrotate/logrotate
 Source0: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
 Source1: rwtab
+
+# fix resource leaks reported by Coverity
+Patch:   0001-logrotate-3.18.0-fix-resource-leaks.patch
 
 BuildRequires: acl
 BuildRequires: automake
@@ -107,6 +110,9 @@ fi
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Tue May 04 2021 Kamil Dudka <kdudka@redhat.com> - 3.18.0-3
+- fix resource leaks reported by Coverity
+
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.18.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 

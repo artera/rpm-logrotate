@@ -1,0 +1,615 @@
+From 471cf0a6a90e5d45f116f404e1276ea730dbece6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
+Date: Fri, 26 Mar 2021 17:18:09 +0100
+Subject: [PATCH 1/9] Do not report OOM incorrectly
+
+In case there is no file in the set to rotate `calloc(0, ...)` is called
+, which might return NULL.
+
+Order the check for a zero number of files first, to void calling calloc
+with a size of zero.
+
+Upstream-commit: 7b65b267d73970eb59061be907c8c35b4396ada9
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ logrotate.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/logrotate.c b/logrotate.c
+index 507c85a..a8c8480 100644
+--- a/logrotate.c
++++ b/logrotate.c
+@@ -2212,11 +2212,6 @@ static int rotateLogSet(const struct logInfo *log, int force)
+     struct logState **state;
+     struct logNames **rotNames;
+ 
+-    logHasErrors = calloc(log->numFiles, sizeof(int));
+-    if (!logHasErrors) {
+-        message_OOM();
+-        return 1;
+-    }
+     message(MESS_DEBUG, "\nrotating pattern: %s ", log->pattern);
+     if (force) {
+         message(MESS_DEBUG, "forced from command line ");
+@@ -2277,10 +2272,15 @@ static int rotateLogSet(const struct logInfo *log, int force)
+ 
+     if (log->numFiles == 0) {
+         message(MESS_DEBUG, "No logs found. Rotation not needed.\n");
+-        free(logHasErrors);
+         return 0;
+     }
+ 
++    logHasErrors = calloc(log->numFiles, sizeof(int));
++    if (!logHasErrors) {
++        message_OOM();
++        return 1;
++    }
++
+     if (log->flags & LOG_FLAG_SU) {
+         if (switch_user(log->suUid, log->suGid) != 0) {
+             free(logHasErrors);
+-- 
+2.30.2
+
+
+From 96203f4cdc64e2df3d203231bd1247424a20875e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
+Date: Mon, 19 Apr 2021 15:35:37 +0200
+Subject: [PATCH 2/9] Unify asprintf usage
+
+Unify the error checking of asprintf(3).
+
+Also reset the target string pointer to NULL on error, if it is non-
+local, since the content is undefined according to the specification.
+
+Also fix potential NULL-pointer usage in sprintf(3):
+
+logrotate.c:1595:
+    rotNames->dirName = malloc(strlen(ld) + strlen(log->oldDir) + 2);
+    sprintf(rotNames->dirName, "%s/%s", ld, log->oldDir);
+
+Upstream-commit: 5afcdeecc5a3bfe07671a3c05c7a301da9206ccd
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ config.c    | 28 +++++++++++++---------------
+ logrotate.c |  9 ++++++---
+ 2 files changed, 19 insertions(+), 18 deletions(-)
+
+diff --git a/config.c b/config.c
+index df2d90b..19dcfce 100644
+--- a/config.c
++++ b/config.c
+@@ -815,21 +815,19 @@ int readAllConfigPaths(const char **paths)
+ 
+ 
+     for (i = 0; i < defTabooCount; i++) {
+-        int bytes;
+         char *pattern = NULL;
+ 
+         /* generate a pattern by concatenating star (wildcard) to the
+          * suffix literal
+          */
+-        bytes = asprintf(&pattern, "*%s", defTabooExts[i]);
+-        if (bytes != -1) {
+-            tabooPatterns[i] = pattern;
+-            tabooCount++;
+-        } else {
++        if (asprintf(&pattern, "*%s", defTabooExts[i]) < 0) {
+             free_2d_array(tabooPatterns, tabooCount);
+             message_OOM();
+             return 1;
+         }
++
++        tabooPatterns[i] = pattern;
++        tabooCount++;
+     }
+ 
+     for (file = paths; *file; file++) {
+@@ -1421,7 +1419,6 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+                         }
+ 
+                         while (*endtag) {
+-                            int bytes;
+                             char *pattern = NULL;
+ 
+                             chptr = endtag;
+@@ -1437,10 +1434,11 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+                                     RAISE_ERROR();
+                                 }
+                                 tabooPatterns = tmp;
+-                                bytes = asprintf(&pattern, "*%.*s", (int)(chptr - endtag), endtag);
++                                if (asprintf(&pattern, "*%.*s", (int)(chptr - endtag), endtag) < 0) {
++                                    message_OOM();
++                                    RAISE_ERROR();
++                                }
+ 
+-                                /* should test for malloc() failure */
+-                                assert(bytes != -1);
+                                 tabooPatterns[tabooCount] = pattern;
+                                 tabooCount++;
+                             }
+@@ -1481,7 +1479,6 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+                         }
+ 
+                         while (*endtag) {
+-                            int bytes;
+                             char *pattern = NULL;
+                             char **tmp;
+ 
+@@ -1496,10 +1493,11 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+                                 RAISE_ERROR();
+                             }
+                             tabooPatterns = tmp;
+-                            bytes = asprintf(&pattern, "%.*s", (int)(chptr - endtag), endtag);
++                            if (asprintf(&pattern, "%.*s", (int)(chptr - endtag), endtag) < 0) {
++                                message_OOM();
++                                RAISE_ERROR();
++                            }
+ 
+-                            /* should test for malloc() failure */
+-                            assert(bytes != -1);
+                             tabooPatterns[tabooCount] = pattern;
+                             tabooCount++;
+ 
+@@ -1540,7 +1538,7 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+                                 env_home = pwd->pw_dir;
+                             }
+ 
+-                            if (asprintf(&new_key, "%s/%s", env_home, key + 2) == -1) {
++                            if (asprintf(&new_key, "%s/%s", env_home, key + 2) < 0) {
+                                 message_OOM();
+                                 RAISE_ERROR();
+                             }
+diff --git a/logrotate.c b/logrotate.c
+index a8c8480..e294352 100644
+--- a/logrotate.c
++++ b/logrotate.c
+@@ -1576,9 +1576,9 @@ static int prerotateSingleLog(const struct logInfo *log, unsigned logNum,
+         ld = dirname(logpath);
+         if (log->oldDir) {
+             if (log->oldDir[0] != '/') {
+-                rotNames->dirName =
+-                    malloc(strlen(ld) + strlen(log->oldDir) + 2);
+-                sprintf(rotNames->dirName, "%s/%s", ld, log->oldDir);
++                if (asprintf(&rotNames->dirName, "%s/%s", ld, log->oldDir) < 0) {
++                    rotNames->dirName = NULL;
++                }
+             } else
+                 rotNames->dirName = strdup(log->oldDir);
+         } else
+@@ -1983,6 +1983,7 @@ static int prerotateSingleLog(const struct logInfo *log, unsigned logNum,
+         if (asprintf(&(rotNames->finalName), "%s/%s%s%s", rotNames->dirName,
+                      rotNames->baseName, dext_str, fileext) < 0) {
+             message_OOM();
++            rotNames->finalName = NULL;
+             return 1;
+         }
+         if (asprintf(&destFile, "%s%s", rotNames->finalName, compext) < 0) {
+@@ -2001,6 +2002,7 @@ static int prerotateSingleLog(const struct logInfo *log, unsigned logNum,
+         if (asprintf(&(rotNames->finalName), "%s/%s.%d%s", rotNames->dirName,
+                      rotNames->baseName, logStart, fileext) < 0) {
+             message_OOM();
++            rotNames->finalName = NULL;
+         }
+     }
+ 
+@@ -2084,6 +2086,7 @@ static int rotateSingleLog(const struct logInfo *log, unsigned logNum,
+                 free(rotNames->disposeName);
+                 if (asprintf(&rotNames->disposeName, "%s%s", rotNames->finalName, ext) < 0) {
+                     message_OOM();
++                    rotNames->disposeName = NULL;
+                     return 1;
+                 }
+ 
+-- 
+2.30.2
+
+
+From 3cf921e0d58993b064cd6d52b44835008345f498 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
+Date: Mon, 19 Apr 2021 15:40:19 +0200
+Subject: [PATCH 3/9] Update custom asprintf implementation
+
+Check for vsnprintf(3) failures.
+
+Silence conversion warnings.
+
+Do not call exit(2) on allocation failure, but return -1 like the
+specification says. All callers check the return value, since they
+need to handle standard asprintf(3) implementations.
+
+Upstream-commit: f917b31dbb47992bf5c5342c7312ddb2e64efc40
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ config.c | 20 ++++++++------------
+ 1 file changed, 8 insertions(+), 12 deletions(-)
+
+diff --git a/config.c b/config.c
+index 19dcfce..0d79980 100644
+--- a/config.c
++++ b/config.c
+@@ -61,24 +61,20 @@ int asprintf(char **string_ptr, const char *format, ...)
+ 
+     va_start(arg, format);
+     size = vsnprintf(NULL, 0, format, arg);
+-    size++;
+     va_end(arg);
+-    va_start(arg, format);
+-    str = malloc(size);
++    if (size < 0) {
++        return -1;
++    }
++    str = malloc((size_t)size + 1);
+     if (str == NULL) {
+-        va_end(arg);
+-        /*
+-         * Strictly speaking, GNU asprintf doesn't do this,
+-         * but the caller isn't checking the return value.
+-         */
+-        message_OOM();
+-        exit(1);
++        return -1;
+     }
+-    rv = vsnprintf(str, size, format, arg);
++    va_start(arg, format);
++    rv = vsnprintf(str, (size_t)size + 1, format, arg);
+     va_end(arg);
+ 
+     *string_ptr = str;
+-    return (rv);
++    return rv;
+ }
+ 
+ #endif
+-- 
+2.30.2
+
+
+From ace9818a606a0c96bb6e4da479ed151650b8fa3a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
+Date: Mon, 19 Apr 2021 15:45:55 +0200
+Subject: [PATCH 4/9] Use asprintf instead of split malloc + sprintf
+
+Use asprintf(3) instead of split usage of malloc(3) and sprintf(3) to
+reduce the chance of potential size inconsistencies.
+
+Upstream-commit: 001352baa924f021748513b6d09d37eca754d5cc
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ config.c    |  5 ++---
+ logrotate.c | 25 ++++++++++++-------------
+ 2 files changed, 14 insertions(+), 16 deletions(-)
+
+diff --git a/config.c b/config.c
+index 0d79980..2905ff7 100644
+--- a/config.c
++++ b/config.c
+@@ -1886,13 +1886,12 @@ duperror:
+                                     continue;
+                                 }
+                             }
+-                            ld = malloc(strlen(dirName) + strlen(newlog->oldDir) + 2);
+-                            if (ld == NULL) {
++                            if (asprintf(&ld, "%s/%s", dirName, newlog->oldDir) < 0) {
+                                 message_OOM();
+                                 free(dirpath);
+                                 goto error;
+                             }
+-                            sprintf(ld, "%s/%s", dirName, newlog->oldDir);
++
+                             free(dirpath);
+ 
+                             if (newlog->oldDir[0] != '/') {
+diff --git a/logrotate.c b/logrotate.c
+index e294352..a72329e 100644
+--- a/logrotate.c
++++ b/logrotate.c
+@@ -1810,15 +1810,6 @@ static int prerotateSingleLog(const struct logInfo *log, unsigned logNum,
+         }
+     }
+ 
+-    /* adding 2 due to / and \0 being added by snprintf */
+-    rotNames->firstRotated =
+-        malloc(strlen(rotNames->dirName) + strlen(rotNames->baseName) +
+-                strlen(fileext) + strlen(compext) + DATEEXT_LEN + 2 );
+-    if (rotNames->firstRotated == NULL) {
+-        message_OOM();
+-        return 1;
+-    }
+-
+     if (log->flags & LOG_FLAG_DATEEXT) {
+         /* glob for compressed files with our pattern
+          * and compress ext */
+@@ -1882,9 +1873,13 @@ static int prerotateSingleLog(const struct logInfo *log, unsigned logNum,
+             rotNames->disposeName = NULL;
+         }
+         /* firstRotated is most recently created/compressed rotated log */
+-        sprintf(rotNames->firstRotated, "%s/%s%s%s%s",
++        if (asprintf(&rotNames->firstRotated, "%s/%s%s%s%s",
+                 rotNames->dirName, rotNames->baseName, dext_str, fileext,
+-                (log->flags & LOG_FLAG_DELAYCOMPRESS) ? "" : compext);
++                (log->flags & LOG_FLAG_DELAYCOMPRESS) ? "" : compext) < 0) {
++            message_OOM();
++            rotNames->firstRotated = NULL;
++            return 1;
++        }
+         globfree(&globResult);
+         free(glob_pattern);
+     } else {
+@@ -1915,9 +1910,13 @@ static int prerotateSingleLog(const struct logInfo *log, unsigned logNum,
+             }
+         }
+ 
+-        sprintf(rotNames->firstRotated, "%s/%s.%d%s%s", rotNames->dirName,
++        if (asprintf(&rotNames->firstRotated, "%s/%s.%d%s%s", rotNames->dirName,
+                 rotNames->baseName, logStart, fileext,
+-                (log->flags & LOG_FLAG_DELAYCOMPRESS) ? "" : compext);
++                (log->flags & LOG_FLAG_DELAYCOMPRESS) ? "" : compext) < 0) {
++            message_OOM();
++            rotNames->firstRotated = NULL;
++            return 1;
++        }
+ 
+         for (i = rotateCount + logStart - 1; (i >= 0) && !hasErrors; i--) {
+             free(newName);
+-- 
+2.30.2
+
+
+From e8a655ef1977add152d79c4dc8148fe7b1c9bca2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
+Date: Mon, 19 Apr 2021 17:52:48 +0200
+Subject: [PATCH 5/9] Mark read-only string variable const
+
+Prevent it accidentally being passed to free(3) or similar.
+
+Upstream-commit: 2231aba823ff6e5a18d996e81ef63df0871224dd
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ logrotate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/logrotate.c b/logrotate.c
+index a72329e..7d49261 100644
+--- a/logrotate.c
++++ b/logrotate.c
+@@ -1567,7 +1567,7 @@ static int prerotateSingleLog(const struct logInfo *log, unsigned logNum,
+     state->lastRotated = now;
+ 
+     {
+-        char *ld;
++        const char *ld;
+         char *logpath = strdup(log->files[logNum]);
+         if (logpath == NULL) {
+             message_OOM();
+-- 
+2.30.2
+
+
+From c06f20f781c74b2256e8f1757433db7e043b4ddf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
+Date: Mon, 19 Apr 2021 17:59:21 +0200
+Subject: [PATCH 6/9] Limit scope of variable
+
+Limit the scope of a variable, by splitting it into several distinct
+block scope variables.
+
+This makes some asprintf(3) calls obsolete, and improves readability by
+splitting the purpose of the variable.
+
+Upstream-commit: b37fb75f569b3ddde30dd85184ea160f63abb7d5
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ logrotate.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
+
+diff --git a/logrotate.c b/logrotate.c
+index 7d49261..962ac55 100644
+--- a/logrotate.c
++++ b/logrotate.c
+@@ -1529,7 +1529,6 @@ static int prerotateSingleLog(const struct logInfo *log, unsigned logNum,
+                               struct logState *state, struct logNames *rotNames)
+ {
+     struct tm now;
+-    char *oldName = NULL;
+     const char *compext = "";
+     const char *fileext = "";
+     int hasErrors = 0;
+@@ -1770,11 +1769,8 @@ static int prerotateSingleLog(const struct logInfo *log, unsigned logNum,
+                 sortGlobResult(&globResult, strlen(rotNames->dirName) + 1 + strlen(rotNames->baseName), dformat);
+                 for (glob_count = 0; glob_count < globResult.gl_pathc && !hasErrors; glob_count++) {
+                     struct stat sbprev;
++                    const char *oldName = globResult.gl_pathv[glob_count];
+ 
+-                    if (asprintf(&oldName, "%s", (globResult.gl_pathv)[glob_count]) < 0) {
+-                        message_OOM();
+-                        return 1;
+-                    }
+                     if (stat(oldName, &sbprev)) {
+                         if (errno == ENOENT)
+                             message(MESS_DEBUG, "previous log %s does not exist\n", oldName);
+@@ -1783,7 +1779,6 @@ static int prerotateSingleLog(const struct logInfo *log, unsigned logNum,
+                     } else {
+                         hasErrors = compressLogFile(oldName, log, &sbprev);
+                     }
+-                    free(oldName);
+                 }
+             } else {
+                 message(MESS_DEBUG,
+@@ -1793,6 +1788,7 @@ static int prerotateSingleLog(const struct logInfo *log, unsigned logNum,
+             free(glob_pattern);
+         } else {
+             struct stat sbprev;
++            char *oldName;
+             if (asprintf(&oldName, "%s/%s.%d%s", rotNames->dirName,
+                          rotNames->baseName, logStart, fileext) < 0) {
+                 message_OOM();
+@@ -1853,16 +1849,14 @@ static int prerotateSingleLog(const struct logInfo *log, unsigned logNum,
+             }
+             if (mail_out != (size_t)-1) {
+                 /* oldName is oldest Backup found (for unlink later) */
+-                if (asprintf(&oldName, "%s", (globResult.gl_pathv)[mail_out]) < 0) {
+-                    message_OOM();
+-                    return 1;
+-                }
++                const char *oldName = globResult.gl_pathv[mail_out];
+                 rotNames->disposeName = strdup(oldName);
+                 if (rotNames->disposeName == NULL) {
+                     message_OOM();
++                    globfree(&globResult);
++                    free(glob_pattern);
+                     return 1;
+                 }
+-                free(oldName);
+             } else {
+                 free(rotNames->disposeName);
+                 rotNames->disposeName = NULL;
+@@ -1878,6 +1872,8 @@ static int prerotateSingleLog(const struct logInfo *log, unsigned logNum,
+                 (log->flags & LOG_FLAG_DELAYCOMPRESS) ? "" : compext) < 0) {
+             message_OOM();
+             rotNames->firstRotated = NULL;
++            globfree(&globResult);
++            free(glob_pattern);
+             return 1;
+         }
+         globfree(&globResult);
+@@ -1885,6 +1881,7 @@ static int prerotateSingleLog(const struct logInfo *log, unsigned logNum,
+     } else {
+         int i;
+         char *newName = NULL;
++        char *oldName;
+ 
+         if (rotateCount == -1) {
+             rotateCount = findLastRotated(rotNames, fileext, compext);
+-- 
+2.30.2
+
+
+From 1a1eb69e6c4ae403edceb411cb0bbc80473e2527 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
+Date: Tue, 20 Apr 2021 17:41:16 +0200
+Subject: [PATCH 7/9] Free memory on noolddir configuration
+
+Consider the following configuration:
+    olddir /var/log/foo
+    noolddir
+
+Do not leak the memory of the initial olddir path.
+
+Upstream-commit: 59e8e321d3221a3beaf7b9c99b17d5cb7dbcfaf0
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ config.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/config.c b/config.c
+index 2905ff7..b7406f5 100644
+--- a/config.c
++++ b/config.c
+@@ -1134,7 +1134,7 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+                         if (newlog->dateformat == NULL)
+                             continue;
+                     } else if (!strcmp(key, "noolddir")) {
+-                        newlog->oldDir = NULL;
++                        freeLogItem(oldDir);
+                     } else if (!strcmp(key, "mailfirst")) {
+                         newlog->flags |= LOG_FLAG_MAILFIRST;
+                     } else if (!strcmp(key, "maillast")) {
+-- 
+2.30.2
+
+
+From 4aabfd0fe19832ba1df8919356d1d2d4b463937d Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Mon, 3 May 2021 15:14:09 +0200
+Subject: [PATCH 8/9] readConfigFile: release `globerr_msg` on all code paths
+
+This eliminates the following reports by Coverity:
+
+Error: RESOURCE_LEAK (CWE-772):
+logrotate-3.18.0.18_7a4d/config.c:1798: alloc_arg: "asprintf" allocates memory that is stored into "globerr_msg". [Note: The source code implementation of the function has been overridden by a builtin model.]
+logrotate-3.18.0.18_7a4d/config.c:2116: leaked_storage: Variable "globerr_msg" going out of scope leaks the storage it points to.
+
+Error: RESOURCE_LEAK (CWE-772):
+logrotate-3.18.0.18_7a4d/config.c:1798: alloc_arg: "asprintf" allocates memory that is stored into "globerr_msg". [Note: The source code implementation of the function has been overridden by a builtin model.]
+logrotate-3.18.0.18_7a4d/config.c:2122: leaked_storage: Variable "globerr_msg" going out of scope leaks the storage it points to.
+
+Closes: https://github.com/logrotate/logrotate/pull/387
+
+Upstream-commit: 97f841be2bb52b9ac00cd564a6eb0a853d1017bd
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ config.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/config.c b/config.c
+index b7406f5..91fd412 100644
+--- a/config.c
++++ b/config.c
+@@ -2086,12 +2086,14 @@ next_state: ;
+ 
+     munmap(buf, length);
+     close(fd);
++    free(globerr_msg);
+     return logerror;
+ error:
+     /* free is a NULL-safe operation */
+     free(key);
+     munmap(buf, length);
+     close(fd);
++    free(globerr_msg);
+     return 1;
+ }
+ 
+-- 
+2.30.2
+
+
+From b5610cd1b0bc2cf9ab887007a953fbf6340cb150 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Mon, 3 May 2021 15:17:59 +0200
+Subject: [PATCH 9/9] prerotateSingleLog: release `oldName` on all code paths
+
+This eliminates the following reports by Coverity:
+
+Error: RESOURCE_LEAK (CWE-772):
+logrotate-3.18.0.18_7a4d/logrotate.c:1911: alloc_arg: "asprintf" allocates memory that is stored into "oldName". [Note: The source code implementation of the function has been overridden by a builtin model.]
+logrotate-3.18.0.18_7a4d/logrotate.c:1919: noescape: Resource "oldName" is not freed or pointed-to in "strdup".
+logrotate-3.18.0.18_7a4d/logrotate.c:1922: leaked_storage: Variable "oldName" going out of scope leaks the storage it points to.
+
+Error: RESOURCE_LEAK (CWE-772):
+logrotate-3.18.0.18_7a4d/logrotate.c:1911: alloc_arg: "asprintf" allocates memory that is stored into "oldName". [Note: The source code implementation of the function has been overridden by a builtin model.]
+logrotate-3.18.0.18_7a4d/logrotate.c:1919: noescape: Resource "oldName" is not freed or pointed-to in "strdup".
+logrotate-3.18.0.18_7a4d/logrotate.c:1931: leaked_storage: Variable "oldName" going out of scope leaks the storage it points to.
+
+Closes: https://github.com/logrotate/logrotate/pull/387
+
+Upstream-commit: 85bc130b19344a3d9c8b472142df14ddcd0a166d
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ logrotate.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/logrotate.c b/logrotate.c
+index 962ac55..d3f2825 100644
+--- a/logrotate.c
++++ b/logrotate.c
+@@ -1903,6 +1903,7 @@ static int prerotateSingleLog(const struct logInfo *log, unsigned logNum,
+             rotNames->disposeName = strdup(oldName);
+             if (rotNames->disposeName == NULL) {
+                 message_OOM();
++                free(oldName);
+                 return 1;
+             }
+         }
+@@ -1911,6 +1912,7 @@ static int prerotateSingleLog(const struct logInfo *log, unsigned logNum,
+                 rotNames->baseName, logStart, fileext,
+                 (log->flags & LOG_FLAG_DELAYCOMPRESS) ? "" : compext) < 0) {
+             message_OOM();
++            free(oldName);
+             rotNames->firstRotated = NULL;
+             return 1;
+         }
+-- 
+2.30.2
+
