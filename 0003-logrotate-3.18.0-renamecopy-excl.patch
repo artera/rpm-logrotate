@@ -1,0 +1,89 @@
+From 337eb1492f8b694542d704c7a4612e3211f717e5 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Tue, 27 Apr 2021 20:52:32 +0200
+Subject: [PATCH 2/2] make `renamecopy` and `copytruncate` override each other
+
+These option cannot work together.  This rule prevents unnecessary
+rotation failure in case one of the options comes from the global
+configuration and the other one from log-specific configuration.
+
+Bug: https://bugzilla.redhat.com/1934601
+
+Closes: https://github.com/logrotate/logrotate/pull/386
+
+Upstream-commit: fe53a0efd21c11dbe9705564f92f5d9aa6bf855e
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+---
+ config.c               | 2 ++
+ logrotate.8.in         | 3 ++-
+ test/test-config.24.in | 3 +++
+ test/test-config.58.in | 3 +++
+ 4 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/config.c b/config.c
+index 91fd412..1bca9e4 100644
+--- a/config.c
++++ b/config.c
+@@ -1106,10 +1106,12 @@ static int readConfigFile(const char *configFile, struct logInfo *defConfig)
+                         newlog->flags &= ~LOG_FLAG_SHAREDSCRIPTS;
+                     } else if (!strcmp(key, "copytruncate")) {
+                         newlog->flags |= LOG_FLAG_COPYTRUNCATE;
++                        newlog->flags &= ~LOG_FLAG_TMPFILENAME;
+                     } else if (!strcmp(key, "nocopytruncate")) {
+                         newlog->flags &= ~LOG_FLAG_COPYTRUNCATE;
+                     } else if (!strcmp(key, "renamecopy")) {
+                         newlog->flags |= LOG_FLAG_TMPFILENAME;
++                        newlog->flags &= ~LOG_FLAG_COPYTRUNCATE;
+                     } else if (!strcmp(key, "norenamecopy")) {
+                         newlog->flags &= ~LOG_FLAG_TMPFILENAME;
+                     } else if (!strcmp(key, "copy")) {
+diff --git a/logrotate.8.in b/logrotate.8.in
+index 8064d68..f0aa23f 100644
+--- a/logrotate.8.in
++++ b/logrotate.8.in
+@@ -430,7 +430,7 @@ truncating it, so some logging data might be lost.
+ When this option is used, the \fBcreate\fR option will have no effect,
+ as the old log file stays in place.  The \fBcopytruncate\fR option allows
+ storing rotated log files on the different devices using \fBolddir\fR
+-directive.
++directive.  The \fBcopytruncate\fR option implies \fBnorenamecopy\fR.
+ 
+ .TP
+ \fBnocopytruncate\fR
+@@ -444,6 +444,7 @@ Log file is renamed to temporary filename in the same directory by adding
+ and log file is copied from temporary filename to final filename.  In the end,
+ temporary filename is removed.  The \fBrenamecopy\fR option allows storing
+ rotated log files on the different devices using \fBolddir\fR directive.
++The \fBrenamecopy\fR option implies \fBnocopytruncate\fR.
+ 
+ .TP
+ \fBnorenamecopy\fR
+diff --git a/test/test-config.24.in b/test/test-config.24.in
+index 35cfcd3..7a2a760 100644
+--- a/test/test-config.24.in
++++ b/test/test-config.24.in
+@@ -1,5 +1,8 @@
+ create
+ 
++# will be overridden by copytruncate
++renamecopy
++
+ &DIR&/test*.log {
+     daily
+     copytruncate
+diff --git a/test/test-config.58.in b/test/test-config.58.in
+index 34906da..79058be 100644
+--- a/test/test-config.58.in
++++ b/test/test-config.58.in
+@@ -1,5 +1,8 @@
+ create
+ 
++# will be overridden by renamecopy
++copytruncate
++
+ &DIR&/test.log {
+     renamecopy
+     weekly
+-- 
+2.30.2
+

@@ -13,6 +13,9 @@ Patch:   0001-logrotate-3.18.0-fix-resource-leaks.patch
 # unify documentation of copy/copytruncate/renamecopy (#1934629)
 Patch:   0002-logrotate-3.18.0-copytruncate-doc.patch
 
+# make `renamecopy` and `copytruncate` override each other (#1934601)
+Patch:   0003-logrotate-3.18.0-renamecopy-excl.patch
+
 BuildRequires: acl
 BuildRequires: automake
 BuildRequires: gcc
@@ -114,6 +117,7 @@ fi
 
 %changelog
 * Tue May 04 2021 Kamil Dudka <kdudka@redhat.com> - 3.18.0-3
+- make `renamecopy` and `copytruncate` override each other (#1934601)
 - unify documentation of copy/copytruncate/renamecopy (#1934629)
 - fix resource leaks reported by Coverity
 
