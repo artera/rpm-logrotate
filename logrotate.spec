@@ -10,6 +10,9 @@ Source1: rwtab
 # fix resource leaks reported by Coverity
 Patch:   0001-logrotate-3.18.0-fix-resource-leaks.patch
 
+# unify documentation of copy/copytruncate/renamecopy (#1934629)
+Patch:   0002-logrotate-3.18.0-copytruncate-doc.patch
+
 BuildRequires: acl
 BuildRequires: automake
 BuildRequires: gcc
@@ -111,6 +114,7 @@ fi
 
 %changelog
 * Tue May 04 2021 Kamil Dudka <kdudka@redhat.com> - 3.18.0-3
+- unify documentation of copy/copytruncate/renamecopy (#1934629)
 - fix resource leaks reported by Coverity
 
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.18.0-2
