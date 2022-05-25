@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.18.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2+
 URL: https://github.com/logrotate/logrotate
 Source0: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
@@ -15,6 +15,9 @@ Patch:   0002-logrotate-3.18.0-copytruncate-doc.patch
 
 # make `renamecopy` and `copytruncate` override each other (#1934601)
 Patch:   0003-logrotate-3.18.0-renamecopy-excl.patch
+
+# fix potential DoS from unprivileged users via the state file (CVE-2022-1348)
+Patch:   0004-logrotate-3.18.0-CVE-2022-1348.patch
 
 BuildRequires: acl
 BuildRequires: automake
@@ -112,10 +115,13 @@ fi
 %dir %{_sysconfdir}/logrotate.d
 %config(noreplace) %{_sysconfdir}/logrotate.d/{b,w}tmp
 %dir %{_localstatedir}/lib/logrotate
-%ghost %verify(not size md5 mtime) %attr(0644, root, root) %{_localstatedir}/lib/logrotate/logrotate.status
+%ghost %verify(not size md5 mtime) %attr(0640, root, root) %{_localstatedir}/lib/logrotate/logrotate.status
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Wed May 25 2022 Kamil Dudka <kdudka@redhat.com> - 3.18.0-4
+- fix potential DoS from unprivileged users via the state file (CVE-2022-1348)
+
 * Tue May 04 2021 Kamil Dudka <kdudka@redhat.com> - 3.18.0-3
 - make `renamecopy` and `copytruncate` override each other (#1934601)
 - unify documentation of copy/copytruncate/renamecopy (#1934629)
