@@ -1,7 +1,7 @@
 Summary: Rotates, compresses, removes and mails system log files
 Name: logrotate
 Version: 3.18.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2+
 URL: https://github.com/logrotate/logrotate
 Source0: https://github.com/logrotate/logrotate/releases/download/%{version}/logrotate-%{version}.tar.xz
@@ -119,6 +119,9 @@ fi
 %config(noreplace) %{_sysconfdir}/rwtab.d/logrotate
 
 %changelog
+* Fri May 27 2022 Kamil Dudka <kdudka@redhat.com> - 3.18.0-5
+- lockState: do not print `error:` when exit code is unaffected (#2090926)
+
 * Wed May 25 2022 Kamil Dudka <kdudka@redhat.com> - 3.18.0-4
 - fix potential DoS from unprivileged users via the state file (CVE-2022-1348)
 
