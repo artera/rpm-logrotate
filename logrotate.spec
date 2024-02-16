@@ -8,16 +8,16 @@ Source0: https://github.com/logrotate/logrotate/releases/download/%{version}/log
 Source1: rwtab
 
 # fix resource leaks reported by Coverity
-Patch:   0001-logrotate-3.18.0-fix-resource-leaks.patch
+Patch1:   0001-logrotate-3.18.0-fix-resource-leaks.patch
 
 # unify documentation of copy/copytruncate/renamecopy (#1934629)
-Patch:   0002-logrotate-3.18.0-copytruncate-doc.patch
+Patch2:   0002-logrotate-3.18.0-copytruncate-doc.patch
 
 # make `renamecopy` and `copytruncate` override each other (#1934601)
-Patch:   0003-logrotate-3.18.0-renamecopy-excl.patch
+Patch3:   0003-logrotate-3.18.0-renamecopy-excl.patch
 
 # fix potential DoS from unprivileged users via the state file (CVE-2022-1348)
-Patch:   0004-logrotate-3.18.0-CVE-2022-1348.patch
+Patch4:   0004-logrotate-3.18.0-CVE-2022-1348.patch
 
 BuildRequires: acl
 BuildRequires: automake
@@ -343,7 +343,7 @@ fi
 - fix #708367 - fixed mail directive parsing
 
 * Mon Mar 28 2011 Jan Kaluza <jkaluza@redhat.com> 3.7.9-9
-- fix #689061 - added Url 
+- fix #689061 - added Url
 
 * Mon Mar 21 2011 Jan Kaluza <jkaluza@redhat.com> 3.7.9-8
 - fix #688520 - fixed CVE-2011-1154, CVE-2011-1155 and CVE-2011-1098
@@ -469,7 +469,7 @@ fi
 - add error checking before running prerotate and postrotate scripts
 
 * Thu Mar 29 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.5-2
-- fix error hadnling after prerotate, postrotate, firstaction 
+- fix error hadnling after prerotate, postrotate, firstaction
   script failure. (http://qa.mandriva.com/show_bug.cgi?id=29979)
 
 * Thu Mar 01 2007 Peter Vrabec <pvrabec@redhat.com> 3.7.5-1
@@ -569,7 +569,7 @@ fi
 - do not run compression program in debug mode (#166912)
 
 * Wed Sep 07 2005 Peter Vrabec <pvrabec@redhat.com> 3.7.2-3
-- even when sharedscript option used, do postrotate 
+- even when sharedscript option used, do postrotate
   script before compress (#167575)
 
 * Wed Aug 17 2005 Peter Vrabec <pvrabec@redhat.com> 3.7.2-2
